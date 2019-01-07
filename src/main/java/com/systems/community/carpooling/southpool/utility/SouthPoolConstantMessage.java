@@ -68,9 +68,9 @@ public class SouthPoolConstantMessage {
 	public String showThankUpdate() {
 		StringBuilder messageBuilder = new StringBuilder();
 		messageBuilder.append("Hi SOUTHPOOL members,").append("\n");
-		messageBuilder.append("Good AM :)\n");
+		messageBuilder.append("Good PM :)\n");
 		messageBuilder.append("Happy to share with you some of the @southpoolservicebot functionality updates.\n\n");
-		messageBuilder.append("1. Verify feature is already available. You can now verify your account or other members account using the bot.\n\n");
+		messageBuilder.append("1. Report Traffic Status button is already available.\n Thisfeature allows all members to share any traffic related information like oil price hike/rollback, traffic status or any MMDA operations.\n\n");
 		//messageBuilder.append("2. Fix duplicate Time when displaying member info after editing.\n");
 		messageBuilder.append(" \n");
 		messageBuilder.append("Contact Technical/Developer if you have any questions, concerns or issues about the bot.\n");

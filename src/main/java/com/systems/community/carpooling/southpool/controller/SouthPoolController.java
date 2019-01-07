@@ -102,7 +102,7 @@ public class SouthPoolController extends TelegramLongPollingBot {
 		menuManager.addMenuItem(EmojiParser.parseToUnicode(":mag_right: ") + "Search", CallBackContants.SEARCH_POST);
 		menuManager.addMenuItem(EmojiParser.parseToUnicode(":white_check_mark: ") + "Verify", CallBackContants.VERIFY_MEMBER);
 		menuManager.addMenuItem(EmojiParser.parseToUnicode(":traffic_light: ") + "Report Traffic Status", CallBackContants.REPORT_TRAFFIC);
-//		menuManager.addMenuItem(EmojiParser.parseToUnicode(":bird: ") + "Bot Update", CallBackContants.BOT_UPDATE);
+		//menuManager.addMenuItem(EmojiParser.parseToUnicode(":bird: ") + "Bot Update", CallBackContants.BOT_UPDATE);
 		menuManager.init();
 
 		menuManagerUpdate.setColumnsCount(3);

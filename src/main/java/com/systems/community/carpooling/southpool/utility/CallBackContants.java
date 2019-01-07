@@ -47,6 +47,7 @@ public class CallBackContants {
 	public static final String POST_REQUEST = "post_request";
 	public static final String SEARCH_POST = "search_post";
 	public static final String VERIFY_MEMBER = "verify_member";
+	public static final String REPORT_TRAFFIC = "report_traffic";
 	
 	public static final String BOT_UPDATE = "bot_update";
 }

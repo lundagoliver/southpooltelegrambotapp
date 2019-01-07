@@ -32,11 +32,13 @@ public class SouthPoolConstantMessage {
 	public static final String UPDATED = "Please review your information before posting. Thank you!";
 
 	public static final String RESQUEST_POSTED = "Your request was successfully posted in SOUTHPOOL telegram group carpooling community.Thank you!\n\n";
+	public static final String REPORT_POSTED = "Your report was successfully posted in SOUTHPOOL telegram group carpooling community.Thank you!\n\n";
 	public static final String RESQUEST_MAX = "Sorry, you have reached the maximum allowable limit to post a request for this day.You may try again tomorrow.Thank you!\n\n";
 
 	public static final String FEATURE_NOT_AVAILABLE_YET = "This feature will be available on future releases. Thank you for your patience.\n";
 	
 	public static final String VERIFY_MEMBER = "Please enter the username of the member that you want to verify :\n";
+	public static final String REPORT_TRAFFIC_STATUS = "Please enter any traffic related information that you want to share in the group.\n\n Example:\n oil price hike/rollback, traffic status or any MMDA operations:\n";
 	
 	public static final String SEARCH_DRIVER = "Searching for DRIVER. Please wait...";
 	public static final String SEARCH_PASSENGER = "Searching for PASSENGER. Please wait...";

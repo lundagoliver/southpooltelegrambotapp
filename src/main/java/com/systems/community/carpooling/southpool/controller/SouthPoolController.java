@@ -101,11 +101,12 @@ public class SouthPoolController extends TelegramLongPollingBot {
 		menuManager.addMenuItem(EmojiParser.parseToUnicode(":bird: ") + "Request", CallBackContants.POST_REQUEST);
 		menuManager.addMenuItem(EmojiParser.parseToUnicode(":mag_right: ") + "Search", CallBackContants.SEARCH_POST);
 		menuManager.addMenuItem(EmojiParser.parseToUnicode(":white_check_mark: ") + "Verify", CallBackContants.VERIFY_MEMBER);
+		menuManager.addMenuItem(EmojiParser.parseToUnicode(":traffic_light: ") + "Report Traffic Status", CallBackContants.REPORT_TRAFFIC);
 //		menuManager.addMenuItem(EmojiParser.parseToUnicode(":bird: ") + "Bot Update", CallBackContants.BOT_UPDATE);
 		menuManager.init();
 
 		menuManagerUpdate.setColumnsCount(3);
-		menuManagerUpdate.setButtonsPerPage(16);
+		menuManagerUpdate.setButtonsPerPage(20);
 		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":lower_left_ballpoint_pen: ") + "Name", CallBackContants.SET_NAME);
 		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":lower_left_ballpoint_pen: ") + "Fb Link", CallBackContants.SET_FB_PROFILE_LINK);
 		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":lower_left_ballpoint_pen: ") + "Mobile", CallBackContants.SET_MOBILE);
@@ -122,15 +123,17 @@ public class SouthPoolController extends TelegramLongPollingBot {
 		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":mag_right: ") + "Search", CallBackContants.SEARCH_POST);
 		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":white_check_mark: ") + "Verify", CallBackContants.VERIFY_MEMBER);
 		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":information_source: ") + "My info", CallBackContants.SHOW_MEMBER_INFO);
+		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":traffic_light: ") + "Report Traffic Status", CallBackContants.REPORT_TRAFFIC);
 		menuManagerUpdate.init();
 
 		menuManagerPost.setColumnsCount(2);
-		menuManagerPost.setButtonsPerPage(6);
+		menuManagerPost.setButtonsPerPage(8);
 		menuManagerPost.addMenuItem(EmojiParser.parseToUnicode(":taxi: ") + "Post as Driver", CallBackContants.POST_AS_DRIVER);
 		menuManagerPost.addMenuItem(EmojiParser.parseToUnicode(":male_office_worker: ") +"Post as Passenger", CallBackContants.POST_AS_PASSENGER);
 		menuManagerPost.addMenuItem(EmojiParser.parseToUnicode(":taxi: ") + "Driver Tomorrow", CallBackContants.POST_AS_DRIVER_TOMORROW);
 		menuManagerPost.addMenuItem(EmojiParser.parseToUnicode(":male_office_worker: ") +"Passenger Tomorrow", CallBackContants.POST_AS_PASSENGER_TOMORROW);
 		menuManagerPost.addMenuItem(EmojiParser.parseToUnicode(":information_source: ") + "My info", CallBackContants.SHOW_MEMBER_INFO);
+		menuManagerPost.addMenuItem(EmojiParser.parseToUnicode(":traffic_light: ") + "Report Traffic Status", CallBackContants.REPORT_TRAFFIC);
 		menuManagerPost.init();
 
 		menuManagerSearch.setColumnsCount(2);
@@ -228,7 +231,7 @@ public class SouthPoolController extends TelegramLongPollingBot {
 					//Check if the member's information is completed already, if not show message to complete the member's information details.
 					if(isInfoNotComplete(southPoolMemberHomeToWork)) {
 						message.setText("Hi! "+ username +"! How may I help you today?\n" + constantMessage.showInfoToUpdate(southPoolMemberHomeToWork));
-						replaceMessage(chatId, messageId, message);
+						sendMessage(message);
 						break;
 					}
 					//If the member information details are completed already, then show the options for info update and request posting.
@@ -601,8 +604,27 @@ public class SouthPoolController extends TelegramLongPollingBot {
 						
 					}
 
+					else if (SouthPoolConstantMessage.REPORT_TRAFFIC_STATUS.equals(previousUserMessage.getPrevMessage()) && CallBackContants.HOME_TO_WORK_INFO.equals(previousUserMessage.getTag()) || 
+							SouthPoolConstantMessage.REPORT_TRAFFIC_STATUS.equals(previousUserMessage.getPrevMessage()) && CallBackContants.WORK_TO_HOME_INFO.equals(previousUserMessage.getTag())) {
+						try {
+							StringBuilder report = new StringBuilder();
+							report.append("<b>SOUTHPOOL FLASH REPORT</>").append("\n\n");
+							report.append("Details : ").append("\n\n");
+							report.append("<i>").append(messageText).append("</i>\n\n");
+							report.append("Reported by: @"+username).append("\n");
+							southPoolService.sendMessage(report.toString(), southPoolSettings);
+							String ok = EmojiParser.parseToUnicode(":white_check_mark:");
+							message.setText(ok+SouthPoolConstantMessage.REPORT_POSTED);
+							sendMessage(message);
+							message.setText("Please select information to use, register or update :");
+							message.setReplyMarkup(SouthPoolConstantMessage.shownOptionsForWorkAndHomeInfo());
+							sendMessage(message);
+						} catch (UnsupportedEncodingException e) {
+							log.error("",e);
+						}
+					}
 					
-					if (!SouthPoolConstantMessage.VERIFY_MEMBER.equals(previousUserMessage.getPrevMessage()) && CallBackContants.HOME_TO_WORK_INFO.equals(previousUserMessage.getTag())) {
+					if (!SouthPoolConstantMessage.REPORT_TRAFFIC_STATUS.equals(previousUserMessage.getPrevMessage()) && !SouthPoolConstantMessage.VERIFY_MEMBER.equals(previousUserMessage.getPrevMessage()) && CallBackContants.HOME_TO_WORK_INFO.equals(previousUserMessage.getTag())) {
 						sendMessage(continuousSaveAndSendMessage(message, replyKeyboardMarkup, southPoolMemberHomeToWork, previousUserMessage, username, PreviousMessage.class));
 
 						if (!isInfoNotComplete(southPoolMemberHomeToWork)) {
@@ -623,7 +645,7 @@ public class SouthPoolController extends TelegramLongPollingBot {
 							}
 						}	
 					}
-					else if (!SouthPoolConstantMessage.VERIFY_MEMBER.equals(previousUserMessage.getPrevMessage()) && CallBackContants.WORK_TO_HOME_INFO.equals(previousUserMessage.getTag())) {
+					else if (!SouthPoolConstantMessage.REPORT_TRAFFIC_STATUS.equals(previousUserMessage.getPrevMessage()) && !SouthPoolConstantMessage.VERIFY_MEMBER.equals(previousUserMessage.getPrevMessage()) && CallBackContants.WORK_TO_HOME_INFO.equals(previousUserMessage.getTag())) {
 						sendMessage(continuousSaveAndSendMessage(message, replyKeyboardMarkup, southPoolMemberWorkToHome, previousUserMessage, username, PreviousMessage.class));
 
 						if (!isInfoNotComplete(southPoolMemberWorkToHome)) {
@@ -1350,6 +1372,12 @@ public class SouthPoolController extends TelegramLongPollingBot {
 				sendMessage(message);
 				break;
 				
+			case CallBackContants.REPORT_TRAFFIC:
+				botQuestion = saveAndSendMessage(SouthPoolConstantMessage.REPORT_TRAFFIC_STATUS, previousMessage, username, PreviousMessage.class);
+				message.setText(botQuestion);
+				sendMessage(message);
+				break;
+				
 			case CallBackContants.TOMORROW_DRIVER:
 				message.setText(SouthPoolConstantMessage.FEATURE_NOT_AVAILABLE_YET);
 				sendMessage(message);
@@ -1408,11 +1436,10 @@ public class SouthPoolController extends TelegramLongPollingBot {
 	}
 
 	protected void replaceMessage(long chatId, long messageId, SendMessage message) {
-		EditMessageText newMessage = new EditMessageText()
-				.setChatId(chatId)
-				.setMessageId(Math.toIntExact(messageId))
-				.setText(message.getText())
-				.setReplyMarkup((InlineKeyboardMarkup) message.getReplyMarkup());
+		EditMessageText newMessage = new EditMessageText();
+		newMessage.setChatId(chatId);
+		newMessage.setMessageId(Math.toIntExact(messageId));
+		newMessage.setText(message.getText());
 		try {
 			execute(newMessage);
 		} catch (TelegramApiException e) {

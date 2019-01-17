@@ -128,6 +128,7 @@ public class SouthPoolController extends TelegramLongPollingBot {
 		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":traffic_light: ") + "Report Traffic Status", CallBackContants.REPORT_TRAFFIC);
 		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":no_mobile_phones: ") + "Ban Member", CallBackContants.BAN_MEMBER);
 		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":interrobang: ") + "Complain a Member", CallBackContants.COMPLAIN_MEMBER);
+		
 		menuManagerUpdate.init();
 
 		menuManagerPost.setColumnsCount(2);
@@ -141,6 +142,7 @@ public class SouthPoolController extends TelegramLongPollingBot {
 		menuManagerPost.addMenuItem(EmojiParser.parseToUnicode(":no_mobile_phones: ") + "Ban Member", CallBackContants.BAN_MEMBER);
 		menuManagerPost.addMenuItem(EmojiParser.parseToUnicode(":white_check_mark: ") + "Verify Member", CallBackContants.VERIFY_MEMBER);
 		menuManagerPost.addMenuItem(EmojiParser.parseToUnicode(":interrobang: ") + "Complain a Member", CallBackContants.COMPLAIN_MEMBER);
+		menuManagerPost.addMenuItem(EmojiParser.parseToUnicode(":mag_right: ") + "Search", CallBackContants.SEARCH_POST);
 		menuManagerPost.init();
 
 		menuManagerSearch.setColumnsCount(2);
@@ -794,11 +796,13 @@ public class SouthPoolController extends TelegramLongPollingBot {
 			SouthPoolMemberHomeToWork southPoolMemberHomeToWork = persistenceService.getMember(username, SouthPoolMemberHomeToWork.class);
 			SouthPoolMemberWorkToHome southPoolMemberWorkToHome = persistenceService.getMember(username, SouthPoolMemberWorkToHome.class);
 			
-			if ("N".equalsIgnoreCase(southPoolMemberHomeToWork.getAllowed()) || "N".equalsIgnoreCase(southPoolMemberWorkToHome.getAllowed())) {
-				String x = EmojiParser.parseToUnicode(":x:");
-				message.setText(x+SouthPoolConstantMessage.BANNED_USER);
-				sendMessage(message);
-				return;
+			if (southPoolMemberWorkToHome != null && southPoolMemberWorkToHome != null) {
+				if ("N".equalsIgnoreCase(southPoolMemberHomeToWork.getAllowed()) || "N".equalsIgnoreCase(southPoolMemberWorkToHome.getAllowed())) {
+					String x = EmojiParser.parseToUnicode(":x:");
+					message.setText(x+SouthPoolConstantMessage.BANNED_USER);
+					sendMessage(message);
+					return;
+				}	
 			}
 
 			switch (callData) {

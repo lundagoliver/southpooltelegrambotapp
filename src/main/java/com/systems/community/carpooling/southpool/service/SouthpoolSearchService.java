@@ -129,49 +129,56 @@ public class SouthpoolSearchService {
 		notAvailable.add("I do not have facebook");
 		notAvailable.add("-n/a-");
 		
-		String toSearch =  CallBackContants.TODAY_DRIVER.equals(search) ? "drivers" : "passengers"; 
 		StringBuilder telegramNotif = new StringBuilder();
-		telegramNotif.append("Search results as of " + DateUtility.convertDateToGMT(8)).append("\n");
-		telegramNotif.append("Total of " + toSearch + " found base on your ETA and ETD: " + members.size()).append("\n\n");
-		for (Member member : members) {
-			String etaDate = DateUtility.toLocaDateTime(member.getEta()).format(DateUtility.FORMAT_DATETIME_INFO);
-			String etdDate = DateUtility.toLocaDateTime(member.getEtd()).format(DateUtility.FORMAT_DATETIME_INFO);
+		if (members.size() > 0) {
+			String toSearch =  CallBackContants.TODAY_DRIVER.equals(search) ? "drivers" : "passengers"; 
 			
-			if (!notAvailable.contains(member.getName())) {
-				telegramNotif.append("Name: ").append(member.getName()).append("\n");	
+			telegramNotif.append("Search results as of " + DateUtility.convertDateToGMT(8)).append("\n");
+			telegramNotif.append("Total of "+ members.size() + " " + toSearch + " found base on your ETA and ETD: " + members.size()).append("\n\n");
+			for (Member member : members) {
+				String etaDate = DateUtility.toLocaDateTime(member.getEta()).format(DateUtility.FORMAT_DATETIME_INFO);
+				String etdDate = DateUtility.toLocaDateTime(member.getEtd()).format(DateUtility.FORMAT_DATETIME_INFO);
+				
+				if (!notAvailable.contains(member.getName())) {
+					telegramNotif.append("Name: ").append(member.getName()).append("\n");	
+				}
+				
+				telegramNotif.append("Telegram: ").append("@"+member.getUsername()).append("\n");
+				
+				if (!notAvailable.contains(member.getFacebookProfileLink())) {
+					telegramNotif.append("Profile: ").append(member.getFacebookProfileLink()).append("\n");	
+				}
+				
+				if (!notAvailable.contains(member.getMobileNumber())) {
+					telegramNotif.append("Mobile: ").append(member.getMobileNumber()).append("\n");	
+				}
+				
+				if(CallBackContants.DRIVER.equals(member.getYouAre())) {
+					if (!notAvailable.contains(member.getCarPlateNumber())) {
+						telegramNotif.append("Car Plate: ").append(member.getCarPlateNumber()).append("\n");	
+					}	
+				}
+				
+				telegramNotif.append("\nPick Up: ").append(member.getPicUpLoc()).append("\n");
+				telegramNotif.append("\nDrop Off: ").append(member.getDropOffLoc()).append("\n");
+				telegramNotif.append("\nRoute: ").append(member.getRoute()).append("\n\n");
+				
+				if (!notAvailable.contains(member.getAvailableSlots())) {
+					telegramNotif.append("Seat: ").append(member.getAvailableSlots()).append("\n");	
+				}
+				
+				String etaTime = TimeUtility.convertToStandardTime(etaDate.split(" ")[1],etaDate.split(" ")[2]);
+				String etdTime = TimeUtility.convertToStandardTime(etdDate.split(" ")[1],etdDate.split(" ")[2]);
+				telegramNotif.append("Time: ").append(etaTime +" - "+ etdTime).append("\n");
+				telegramNotif.append("Instruction: ").append(member.getCustomMessage()).append("\n");
+				telegramNotif.append("------------------------------------------------------------------------------------------------------------");
+				telegramNotif.append("\n\n");
 			}
-			
-			telegramNotif.append("Telegram: ").append("@"+member.getUsername()).append("\n");
-			
-			if (!notAvailable.contains(member.getFacebookProfileLink())) {
-				telegramNotif.append("Profile: ").append(member.getFacebookProfileLink()).append("\n");	
-			}
-			
-			if (!notAvailable.contains(member.getMobileNumber())) {
-				telegramNotif.append("Mobile: ").append(member.getMobileNumber()).append("\n");	
-			}
-			
-			if(CallBackContants.DRIVER.equals(member.getYouAre())) {
-				if (!notAvailable.contains(member.getCarPlateNumber())) {
-					telegramNotif.append("Car Plate: ").append(member.getCarPlateNumber()).append("\n");	
-				}	
-			}
-			
-			telegramNotif.append("\nPick Up: ").append(member.getPicUpLoc()).append("\n");
-			telegramNotif.append("\nDrop Off: ").append(member.getDropOffLoc()).append("\n");
-			telegramNotif.append("\nRoute: ").append(member.getRoute()).append("\n\n");
-			
-			if (!notAvailable.contains(member.getAvailableSlots())) {
-				telegramNotif.append("Seat: ").append(member.getAvailableSlots()).append("\n");	
-			}
-			
-			String etaTime = TimeUtility.convertToStandardTime(etaDate.split(" ")[1],etaDate.split(" ")[2]);
-			String etdTime = TimeUtility.convertToStandardTime(etdDate.split(" ")[1],etdDate.split(" ")[2]);
-			telegramNotif.append("Time: ").append(etaTime +" - "+ etdTime).append("\n");
-			telegramNotif.append("Instruction: ").append(member.getCustomMessage()).append("\n");
-			telegramNotif.append("------------------------------------------------------------------------------------------------------------");
-			telegramNotif.append("\n\n");
 		}
+		else {
+			telegramNotif.append("No result found as of " + DateUtility.convertDateToGMT(8)).append(". You may try to search again later. \n");
+		}
+		
 		return telegramNotif.toString();
 	}
 

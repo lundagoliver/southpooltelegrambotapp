@@ -27,11 +27,26 @@ public class SouthPoolService {
 	}
 	
 	@Async
-	public void sendMessage(String text, SouthPoolSettings southPoolSettings) throws UnsupportedEncodingException {
+	public void sendMessage(String text, String groupChatId, SouthPoolSettings southPoolSettings) throws UnsupportedEncodingException {
 		String url = MessageFormat.format(southPoolSettings.getTelegramApiUrl(), southPoolSettings.getGroupchatSenderBotToken());
 		String result = null;
 		try {
-			String sendRequest = UriComponentsBuilder.fromUriString(url).queryParam("chat_id", southPoolSettings.getGroupChatId()).queryParam("parse_mode","HTML")
+			String sendRequest = UriComponentsBuilder.fromUriString(url).queryParam("chat_id", groupChatId).queryParam("parse_mode","HTML")
+					.queryParam("text",text.replace("&", "and")).build().toUriString();
+			log.info(sendRequest);
+			result = restHttpClient.getDefaultRestTemplate().exchange(sendRequest, HttpMethod.GET, null, String.class).getBody();
+		} catch (RestClientException e) {
+			log.error(e);
+		}
+		log.info(result);
+	}
+	
+	@Async
+	public void sendMessageToAdmin(String text, String groupChatId, SouthPoolSettings southPoolSettings) throws UnsupportedEncodingException {
+		String url = MessageFormat.format(southPoolSettings.getTelegramApiUrl(), southPoolSettings.getGroupchatAdminsConcernSernderBot());
+		String result = null;
+		try {
+			String sendRequest = UriComponentsBuilder.fromUriString(url).queryParam("chat_id", groupChatId).queryParam("parse_mode","HTML")
 					.queryParam("text",text.replace("&", "and")).build().toUriString();
 			log.info(sendRequest);
 			result = restHttpClient.getDefaultRestTemplate().exchange(sendRequest, HttpMethod.GET, null, String.class).getBody();

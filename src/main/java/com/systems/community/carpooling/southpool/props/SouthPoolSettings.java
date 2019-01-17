@@ -19,4 +19,8 @@ public class SouthPoolSettings {
 	private String telegramEndPoint;
 	private String telegramApiUrl;
 	private String groupchatSenderBotToken;
+	
+	
+	private String groupChatIdAdmins;
+	private String groupchatAdminsConcernSernderBot;
 }

@@ -32,13 +32,19 @@ public class SouthPoolConstantMessage {
 	public static final String UPDATED = "Please review your information before posting. Thank you!";
 
 	public static final String RESQUEST_POSTED = "Your request was successfully posted in SOUTHPOOL telegram group carpooling community.Thank you!\n\n";
+	public static final String ADMIN_ONLY = "Only the administrators can ban a member. Please use \"Complain a Member\" to report a member.Thank you!\n\n";
 	public static final String REPORT_POSTED = "Your report was successfully posted in SOUTHPOOL telegram group carpooling community.Thank you!\n\n";
+	public static final String BANNED = "User was successfully banned from using SOUTHPOOL telegram group carpooling community.Thank you!\n\n";
+	public static final String BANNED_USER = "You are banned from using SOUTHPOOL telegram group carpooling community. Please contact the administrators. Thank you!\n\n";
 	public static final String RESQUEST_MAX = "Sorry, you have reached the maximum allowable limit to post a request for this day.You may try again tomorrow.Thank you!\n\n";
 
 	public static final String FEATURE_NOT_AVAILABLE_YET = "This feature will be available on future releases. Thank you for your patience.\n";
 	
 	public static final String VERIFY_MEMBER = "Please enter the username of the member that you want to verify :\n";
 	public static final String REPORT_TRAFFIC_STATUS = "Please enter any traffic related information that you want to share in the group.\n\n Example:\n oil price hike/rollback, traffic status or any MMDA operations:\n";
+	public static final String BAN_MEMBER_TO_USE_THE_BOT = "Please enter the username of the member that you want to ban from using southpool :\n";
+	public static final String COMPLAIN_MEMBER_PASSENGER_OR_DRIVER = "Please enter your complain to a passenger or to a driver. This complain will be directly send to the southpool administors only:\n";
+	public static final String POSTED_COMPLAIN_MEMBER_PASSENGER_OR_DRIVER = "Your complain was successfully sent to the SOUTHPOOL administrators. Rest assured that this will be reviewed by the admins and will give necessary action to your concern. Thank you for your cooperation.\n";
 	
 	public static final String SEARCH_DRIVER = "Searching for DRIVER. Please wait...";
 	public static final String SEARCH_PASSENGER = "Searching for PASSENGER. Please wait...";
@@ -60,21 +66,46 @@ public class SouthPoolConstantMessage {
 		StringBuilder messageBuilder = new StringBuilder();
 		messageBuilder.append("Thank you for using @southpoolservicebot").append("\n");
 		messageBuilder.append("Contact Technical/Developer if you have questions about the bot.\n");
+		messageBuilder.append("👤 Creator").append("\n");
+		messageBuilder.append("└ Oliver Delacruz Lundag (http://telegram.me/OliverDela_cruzLundag)").append("\n");
+		messageBuilder.append("👥 Admins (9)").append("\n");
+		messageBuilder.append("├ Group Butler (http://telegram.me/GroupButler_bot)").append("\n");
+		messageBuilder.append("├ Jino (http://telegram.me/Jinopedro)").append("\n");
+		messageBuilder.append("├ Czei (http://telegram.me/b01nk3y)").append("\n");
+		messageBuilder.append("├ Chi (http://telegram.me/chicolors)").append("\n");
+		messageBuilder.append("├ Lileth (http://telegram.me/mrs_jump)").append("\n");
+		messageBuilder.append("├ Chay (http://telegram.me/chaylandicho)").append("\n");
+		messageBuilder.append("├ Jei (http://telegram.me/Iej555)").append("\n");
+		messageBuilder.append("├ Hershey Ceralde (http://telegram.me/Hershey87)").append("\n");
+		messageBuilder.append("└ Jeff (http://telegram.me/JeffMendoza));").append("\n");
+		messageBuilder.append("\n");
 		messageBuilder.append("We'd love to hear all your feedback and suggestions.").append("\n");
-		messageBuilder.append("Telegram : @OliverDela_cruzLundag\n");
+		messageBuilder.append("Thank you for your cooperation.\n");
 		return messageBuilder.toString();
 	}
 	
 	public String showThankUpdate() {
 		StringBuilder messageBuilder = new StringBuilder();
 		messageBuilder.append("Hi SOUTHPOOL members,").append("\n");
-		messageBuilder.append("Good PM :)\n");
+		messageBuilder.append("Good AM :)\n");
 		messageBuilder.append("Happy to share with you some of the @southpoolservicebot functionality updates.\n\n");
-		messageBuilder.append("1. Report Traffic Status button is already available.\n Thisfeature allows all members to share any traffic related information like oil price hike/rollback, traffic status or any MMDA operations.\n\n");
-		//messageBuilder.append("2. Fix duplicate Time when displaying member info after editing.\n");
-		messageBuilder.append(" \n");
-		messageBuilder.append("Contact Technical/Developer if you have any questions, concerns or issues about the bot.\n");
-		messageBuilder.append("Telegram : @OliverDela_cruzLundag\n");
+		messageBuilder.append("1. Ban Member - Only the administrators can ban a member.\n\n");
+		messageBuilder.append("2. Complain a Member - You may now send your complains directly to the southpool administrators.\n Rest assured that this will be reviewed by the admins and will give necessary action to your concern. Thank you for your cooperation.");
+		messageBuilder.append(" \n\n");
+		messageBuilder.append("Contact if you have any questions, concerns or issues about the bot.\n");
+		messageBuilder.append("👤 Creator").append("\n");
+		messageBuilder.append("└ Oliver Delacruz Lundag (http://telegram.me/OliverDela_cruzLundag)").append("\n");
+		messageBuilder.append("👥 Admins (9)").append("\n");
+		messageBuilder.append("├ Group Butler (http://telegram.me/GroupButler_bot)").append("\n");
+		messageBuilder.append("├ Jino (http://telegram.me/Jinopedro)").append("\n");
+		messageBuilder.append("├ Czei (http://telegram.me/b01nk3y)").append("\n");
+		messageBuilder.append("├ Chi (http://telegram.me/chicolors)").append("\n");
+		messageBuilder.append("├ Lileth (http://telegram.me/mrs_jump)").append("\n");
+		messageBuilder.append("├ Chay (http://telegram.me/chaylandicho)").append("\n");
+		messageBuilder.append("├ Jei (http://telegram.me/Iej555)").append("\n");
+		messageBuilder.append("├ Hershey Ceralde (http://telegram.me/Hershey87)").append("\n");
+		messageBuilder.append("└ Jeff (http://telegram.me/JeffMendoza));").append("\n");
+		messageBuilder.append("\n");
 		messageBuilder.append("Thank you for your cooperation.\n");
 		return messageBuilder.toString();
 	}

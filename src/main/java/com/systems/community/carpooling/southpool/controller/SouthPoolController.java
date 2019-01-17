@@ -21,7 +21,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -95,53 +94,63 @@ public class SouthPoolController extends TelegramLongPollingBot {
 	@PostConstruct
 	private void init() {
 		menuManager.setColumnsCount(2);
-		menuManager.setButtonsPerPage(10);
+		menuManager.setButtonsPerPage(20);
 		menuManager.addMenuItem(EmojiParser.parseToUnicode(":information_source: ") + "My Info", CallBackContants.SHOW_MEMBER_INFO);
 		menuManager.addMenuItem(EmojiParser.parseToUnicode(":lower_left_ballpoint_pen: ") + "Edit My info", CallBackContants.UPDATE_MEMBER_INFO);
 		menuManager.addMenuItem(EmojiParser.parseToUnicode(":bird: ") + "Request", CallBackContants.POST_REQUEST);
 		menuManager.addMenuItem(EmojiParser.parseToUnicode(":mag_right: ") + "Search", CallBackContants.SEARCH_POST);
 		menuManager.addMenuItem(EmojiParser.parseToUnicode(":white_check_mark: ") + "Verify", CallBackContants.VERIFY_MEMBER);
 		menuManager.addMenuItem(EmojiParser.parseToUnicode(":traffic_light: ") + "Report Traffic Status", CallBackContants.REPORT_TRAFFIC);
+		menuManager.addMenuItem(EmojiParser.parseToUnicode(":no_mobile_phones: ") + "Ban Member", CallBackContants.BAN_MEMBER);
+		menuManager.addMenuItem(EmojiParser.parseToUnicode(":interrobang: ") + "Complain a Member", CallBackContants.COMPLAIN_MEMBER);
+		
 		//menuManager.addMenuItem(EmojiParser.parseToUnicode(":bird: ") + "Bot Update", CallBackContants.BOT_UPDATE);
 		menuManager.init();
 
-		menuManagerUpdate.setColumnsCount(3);
-		menuManagerUpdate.setButtonsPerPage(20);
-		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":lower_left_ballpoint_pen: ") + "Name", CallBackContants.SET_NAME);
-		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":lower_left_ballpoint_pen: ") + "Fb Link", CallBackContants.SET_FB_PROFILE_LINK);
-		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":lower_left_ballpoint_pen: ") + "Mobile", CallBackContants.SET_MOBILE);
-		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":lower_left_ballpoint_pen: ") + "Car Plate", CallBackContants.SET_CAR_PLATE);
-		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":lower_left_ballpoint_pen: ") + "You Are", CallBackContants.SET_YOU_ARE);
-		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":lower_left_ballpoint_pen: ") + "Pick Up", CallBackContants.SET_PICKUP_LOC);
-		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":lower_left_ballpoint_pen: ") + "Drop Off", CallBackContants.SET_DROP_OFF_LOC);
-		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":lower_left_ballpoint_pen: ") + "Route", CallBackContants.SET_ROUTE);
-		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":lower_left_ballpoint_pen: ") + "Seat", CallBackContants.SET_AVAILABLE_SEAT);
-		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":lower_left_ballpoint_pen: ") + "ETA", CallBackContants.SET_ETA);
-		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":lower_left_ballpoint_pen: ") + "ETD", CallBackContants.SET_ETD);
-		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":lower_left_ballpoint_pen: ") + "Message", CallBackContants.SET_CUSTOM_MESSAGE);
+		menuManagerUpdate.setColumnsCount(2);
+		menuManagerUpdate.setButtonsPerPage(30);
+		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":lower_left_ballpoint_pen: ") + "Edit Name", CallBackContants.SET_NAME);
+		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":lower_left_ballpoint_pen: ") + "Edit Link", CallBackContants.SET_FB_PROFILE_LINK);
+		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":lower_left_ballpoint_pen: ") + "Edit Mobile", CallBackContants.SET_MOBILE);
+		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":lower_left_ballpoint_pen: ") + "Edit Car Plate", CallBackContants.SET_CAR_PLATE);
+		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":lower_left_ballpoint_pen: ") + "Edit You Are", CallBackContants.SET_YOU_ARE);
+		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":lower_left_ballpoint_pen: ") + "Edit Pick Up", CallBackContants.SET_PICKUP_LOC);
+		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":lower_left_ballpoint_pen: ") + "Edit Drop Off", CallBackContants.SET_DROP_OFF_LOC);
+		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":lower_left_ballpoint_pen: ") + "Edit Route", CallBackContants.SET_ROUTE);
+		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":lower_left_ballpoint_pen: ") + "Edit Seat", CallBackContants.SET_AVAILABLE_SEAT);
+		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":lower_left_ballpoint_pen: ") + "Edit ETA", CallBackContants.SET_ETA);
+		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":lower_left_ballpoint_pen: ") + "Edit ETD", CallBackContants.SET_ETD);
+		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":lower_left_ballpoint_pen: ") + "Edit Instruction", CallBackContants.SET_CUSTOM_MESSAGE);
 		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":bird: ") + "Request", CallBackContants.POST_REQUEST);
 		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":mag_right: ") + "Search", CallBackContants.SEARCH_POST);
-		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":white_check_mark: ") + "Verify", CallBackContants.VERIFY_MEMBER);
+		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":white_check_mark: ") + "Verify Member", CallBackContants.VERIFY_MEMBER);
 		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":information_source: ") + "My info", CallBackContants.SHOW_MEMBER_INFO);
 		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":traffic_light: ") + "Report Traffic Status", CallBackContants.REPORT_TRAFFIC);
+		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":no_mobile_phones: ") + "Ban Member", CallBackContants.BAN_MEMBER);
+		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":interrobang: ") + "Complain a Member", CallBackContants.COMPLAIN_MEMBER);
 		menuManagerUpdate.init();
 
 		menuManagerPost.setColumnsCount(2);
-		menuManagerPost.setButtonsPerPage(8);
+		menuManagerPost.setButtonsPerPage(20);
 		menuManagerPost.addMenuItem(EmojiParser.parseToUnicode(":taxi: ") + "Post as Driver", CallBackContants.POST_AS_DRIVER);
 		menuManagerPost.addMenuItem(EmojiParser.parseToUnicode(":male_office_worker: ") +"Post as Passenger", CallBackContants.POST_AS_PASSENGER);
 		menuManagerPost.addMenuItem(EmojiParser.parseToUnicode(":taxi: ") + "Driver Tomorrow", CallBackContants.POST_AS_DRIVER_TOMORROW);
 		menuManagerPost.addMenuItem(EmojiParser.parseToUnicode(":male_office_worker: ") +"Passenger Tomorrow", CallBackContants.POST_AS_PASSENGER_TOMORROW);
 		menuManagerPost.addMenuItem(EmojiParser.parseToUnicode(":information_source: ") + "My info", CallBackContants.SHOW_MEMBER_INFO);
 		menuManagerPost.addMenuItem(EmojiParser.parseToUnicode(":traffic_light: ") + "Report Traffic Status", CallBackContants.REPORT_TRAFFIC);
+		menuManagerPost.addMenuItem(EmojiParser.parseToUnicode(":no_mobile_phones: ") + "Ban Member", CallBackContants.BAN_MEMBER);
+		menuManagerPost.addMenuItem(EmojiParser.parseToUnicode(":white_check_mark: ") + "Verify Member", CallBackContants.VERIFY_MEMBER);
+		menuManagerPost.addMenuItem(EmojiParser.parseToUnicode(":interrobang: ") + "Complain a Member", CallBackContants.COMPLAIN_MEMBER);
 		menuManagerPost.init();
 
 		menuManagerSearch.setColumnsCount(2);
-		menuManagerSearch.setButtonsPerPage(6);
+		menuManagerSearch.setButtonsPerPage(20);
 		menuManagerSearch.addMenuItem(EmojiParser.parseToUnicode(":taxi: :red_car: :mag: ") + " Search Driver", CallBackContants.TODAY_DRIVER);
 		menuManagerSearch.addMenuItem(EmojiParser.parseToUnicode(":male_office_worker: :woman_office_worker: :mag: ") + " Search Passenger", CallBackContants.TODAY_PASSENGER);
-		menuManagerSearch.addMenuItem(EmojiParser.parseToUnicode(":white_check_mark: ") + "Verify", CallBackContants.VERIFY_MEMBER);
+		menuManagerSearch.addMenuItem(EmojiParser.parseToUnicode(":white_check_mark: ") + "Verify Member", CallBackContants.VERIFY_MEMBER);
 		menuManagerSearch.addMenuItem(EmojiParser.parseToUnicode(":information_source: ") + "My Info", CallBackContants.SHOW_MEMBER_INFO);
+		menuManagerSearch.addMenuItem(EmojiParser.parseToUnicode(":traffic_light: ") + "Report Traffic Status", CallBackContants.REPORT_TRAFFIC);
+		menuManagerSearch.addMenuItem(EmojiParser.parseToUnicode(":interrobang: ") + "Complain a Member", CallBackContants.COMPLAIN_MEMBER);
 		menuManagerSearch.init();
 
 
@@ -221,6 +230,12 @@ public class SouthPoolController extends TelegramLongPollingBot {
 				message.setText(constantMessage.notRegisteredMemberMessage());
 				message.setReplyMarkup(constantMessage.shownOptions());
 				sendMessage(message);
+			}
+			else if ("N".equalsIgnoreCase(southPoolMemberHomeToWork.getAllowed()) || "N".equalsIgnoreCase(southPoolMemberWorkToHome.getAllowed())) {
+				String x = EmojiParser.parseToUnicode(":x:");
+				message.setText(x+SouthPoolConstantMessage.BANNED_USER);
+				sendMessage(message);
+				return;
 			}
 			else {
 				switch (messageText) {
@@ -612,7 +627,7 @@ public class SouthPoolController extends TelegramLongPollingBot {
 							report.append("Details : ").append("\n\n");
 							report.append("<i>").append(messageText).append("</i>\n\n");
 							report.append("Reported by: @"+username).append("\n");
-							southPoolService.sendMessage(report.toString(), southPoolSettings);
+							southPoolService.sendMessage(report.toString(),southPoolSettings.getGroupChatId(), southPoolSettings);
 							String ok = EmojiParser.parseToUnicode(":white_check_mark:");
 							message.setText(ok+SouthPoolConstantMessage.REPORT_POSTED);
 							sendMessage(message);
@@ -624,7 +639,67 @@ public class SouthPoolController extends TelegramLongPollingBot {
 						}
 					}
 					
-					if (!SouthPoolConstantMessage.REPORT_TRAFFIC_STATUS.equals(previousUserMessage.getPrevMessage()) && !SouthPoolConstantMessage.VERIFY_MEMBER.equals(previousUserMessage.getPrevMessage()) && CallBackContants.HOME_TO_WORK_INFO.equals(previousUserMessage.getTag())) {
+					else if (SouthPoolConstantMessage.COMPLAIN_MEMBER_PASSENGER_OR_DRIVER.equals(previousUserMessage.getPrevMessage()) && CallBackContants.HOME_TO_WORK_INFO.equals(previousUserMessage.getTag()) || 
+							SouthPoolConstantMessage.COMPLAIN_MEMBER_PASSENGER_OR_DRIVER.equals(previousUserMessage.getPrevMessage()) && CallBackContants.WORK_TO_HOME_INFO.equals(previousUserMessage.getTag())) {
+						StringBuilder report = new StringBuilder();
+						report.append("<b>MEMBER CONCERN</>").append("\n\n");
+						report.append("Details : ").append("\n\n");
+						report.append("<i>").append(messageText).append("</i>\n\n");
+						report.append("Complainant: @"+username).append("\n");
+						try {
+							southPoolService.sendMessageToAdmin(report.toString(),southPoolSettings.getGroupChatIdAdmins(), southPoolSettings);
+						} catch (UnsupportedEncodingException e) {
+							log.error("{}", e);
+						}
+						String ok = EmojiParser.parseToUnicode(":white_check_mark:");
+						message.setText(ok+SouthPoolConstantMessage.POSTED_COMPLAIN_MEMBER_PASSENGER_OR_DRIVER);
+						sendMessage(message);
+						message.setText("Please select information to use, register or update :");
+						message.setReplyMarkup(SouthPoolConstantMessage.shownOptionsForWorkAndHomeInfo());
+						sendMessage(message);
+					}
+					
+					else if (SouthPoolConstantMessage.BAN_MEMBER_TO_USE_THE_BOT.equals(previousUserMessage.getPrevMessage()) && CallBackContants.HOME_TO_WORK_INFO.equals(previousUserMessage.getTag()) || 
+							SouthPoolConstantMessage.BAN_MEMBER_TO_USE_THE_BOT.equals(previousUserMessage.getPrevMessage()) && CallBackContants.WORK_TO_HOME_INFO.equals(previousUserMessage.getTag())) {
+						
+							String user = messageText.contains("@") ? messageText.replaceAll("@", "") : messageText;
+							southPoolMemberHomeToWork = persistenceService.getMember(user, SouthPoolMemberHomeToWork.class);
+							southPoolMemberWorkToHome = persistenceService.getMember(user, SouthPoolMemberWorkToHome.class);
+							if (southPoolMemberHomeToWork == null || southPoolMemberWorkToHome == null) {
+								message.setText("User with username " + user + " does not exist!");
+								sendMessage(message);	
+							}
+							else {
+								southPoolMemberHomeToWork.setAllowed("N");
+								persistenceService.merge(southPoolMemberHomeToWork);
+								southPoolMemberWorkToHome.setAllowed("N");
+								persistenceService.merge(southPoolMemberWorkToHome);
+								
+								StringBuilder report = new StringBuilder();
+								report.append("<b>BANNED MEMBER</>").append("\n\n");
+								report.append("Details : ").append("\n\n");
+								report.append("<i>").append(user + " is banned from SOUTHPOOL community!").append("</i>\n\n");
+								report.append("Banned by: @"+username).append("\n");
+								try {
+									southPoolService.sendMessageToAdmin(report.toString(),southPoolSettings.getGroupChatIdAdmins(), southPoolSettings);
+								} catch (UnsupportedEncodingException e) {
+									log.error("{}", e);
+								}
+								
+								String ok = EmojiParser.parseToUnicode(":white_check_mark:");
+								message.setText(ok+SouthPoolConstantMessage.BANNED);
+								sendMessage(message);
+							}
+							message.setText("Please select information to use, register or update :");
+							message.setReplyMarkup(SouthPoolConstantMessage.shownOptionsForWorkAndHomeInfo());
+							sendMessage(message);
+					}
+					
+					if ( !SouthPoolConstantMessage.COMPLAIN_MEMBER_PASSENGER_OR_DRIVER.equals(previousUserMessage.getPrevMessage()) &&
+							!SouthPoolConstantMessage.BAN_MEMBER_TO_USE_THE_BOT.equals(previousUserMessage.getPrevMessage()) &&
+							!SouthPoolConstantMessage.REPORT_TRAFFIC_STATUS.equals(previousUserMessage.getPrevMessage()) 
+							&& !SouthPoolConstantMessage.VERIFY_MEMBER.equals(previousUserMessage.getPrevMessage()) 
+							&& CallBackContants.HOME_TO_WORK_INFO.equals(previousUserMessage.getTag())) {
 						sendMessage(continuousSaveAndSendMessage(message, replyKeyboardMarkup, southPoolMemberHomeToWork, previousUserMessage, username, PreviousMessage.class));
 
 						if (!isInfoNotComplete(southPoolMemberHomeToWork)) {
@@ -645,7 +720,11 @@ public class SouthPoolController extends TelegramLongPollingBot {
 							}
 						}	
 					}
-					else if (!SouthPoolConstantMessage.REPORT_TRAFFIC_STATUS.equals(previousUserMessage.getPrevMessage()) && !SouthPoolConstantMessage.VERIFY_MEMBER.equals(previousUserMessage.getPrevMessage()) && CallBackContants.WORK_TO_HOME_INFO.equals(previousUserMessage.getTag())) {
+					else if (!SouthPoolConstantMessage.COMPLAIN_MEMBER_PASSENGER_OR_DRIVER.equals(previousUserMessage.getPrevMessage()) 
+							&& !SouthPoolConstantMessage.BAN_MEMBER_TO_USE_THE_BOT.equals(previousUserMessage.getPrevMessage()) 
+							&& !SouthPoolConstantMessage.REPORT_TRAFFIC_STATUS.equals(previousUserMessage.getPrevMessage()) 
+							&& !SouthPoolConstantMessage.VERIFY_MEMBER.equals(previousUserMessage.getPrevMessage()) 
+							&& CallBackContants.WORK_TO_HOME_INFO.equals(previousUserMessage.getTag())) {
 						sendMessage(continuousSaveAndSendMessage(message, replyKeyboardMarkup, southPoolMemberWorkToHome, previousUserMessage, username, PreviousMessage.class));
 
 						if (!isInfoNotComplete(southPoolMemberWorkToHome)) {
@@ -714,6 +793,13 @@ public class SouthPoolController extends TelegramLongPollingBot {
 			PreviousMessage previousMessage = persistenceService.getMember(username, PreviousMessage.class);
 			SouthPoolMemberHomeToWork southPoolMemberHomeToWork = persistenceService.getMember(username, SouthPoolMemberHomeToWork.class);
 			SouthPoolMemberWorkToHome southPoolMemberWorkToHome = persistenceService.getMember(username, SouthPoolMemberWorkToHome.class);
+			
+			if ("N".equalsIgnoreCase(southPoolMemberHomeToWork.getAllowed()) || "N".equalsIgnoreCase(southPoolMemberWorkToHome.getAllowed())) {
+				String x = EmojiParser.parseToUnicode(":x:");
+				message.setText(x+SouthPoolConstantMessage.BANNED_USER);
+				sendMessage(message);
+				return;
+			}
 
 			switch (callData) {
 			case CallBackContants.HOME_TO_WORK_INFO:
@@ -790,7 +876,7 @@ public class SouthPoolController extends TelegramLongPollingBot {
 				if (CallBackContants.HOME_TO_WORK_INFO.equals(previousMessage.getTag())) {
 					southPoolMemberHomeToWork.setCarPlateNumber(memberCars.getCarPlateNumber());
 					try {
-						southPoolService.sendMessage(SouthPoolConstantMessage.showOrPostMyInformation(southPoolMemberHomeToWork), southPoolSettings);
+						southPoolService.sendMessage(SouthPoolConstantMessage.showOrPostMyInformation(southPoolMemberHomeToWork), southPoolSettings.getGroupChatId(), southPoolSettings);
 					} catch (UnsupportedEncodingException e1) {
 						log.error("",e1);
 					}	
@@ -798,7 +884,7 @@ public class SouthPoolController extends TelegramLongPollingBot {
 				else if (CallBackContants.WORK_TO_HOME_INFO.equals(previousMessage.getTag())) {
 					southPoolMemberWorkToHome.setCarPlateNumber(memberCars.getCarPlateNumber());
 					try {
-						southPoolService.sendMessage(SouthPoolConstantMessage.showOrPostMyInformation(southPoolMemberWorkToHome), southPoolSettings);
+						southPoolService.sendMessage(SouthPoolConstantMessage.showOrPostMyInformation(southPoolMemberWorkToHome), southPoolSettings.getGroupChatId(), southPoolSettings);
 					} catch (UnsupportedEncodingException e1) {
 						log.error("",e1);
 					}
@@ -1378,6 +1464,25 @@ public class SouthPoolController extends TelegramLongPollingBot {
 				sendMessage(message);
 				break;
 				
+			case CallBackContants.BAN_MEMBER:
+				if ("Y".equalsIgnoreCase(southPoolMemberHomeToWork.getAdmin()) && "Y".equalsIgnoreCase(southPoolMemberWorkToHome.getAdmin())) {
+					botQuestion = saveAndSendMessage(SouthPoolConstantMessage.BAN_MEMBER_TO_USE_THE_BOT, previousMessage, username, PreviousMessage.class);
+					message.setText(botQuestion);
+					sendMessage(message);	
+				}
+				else {
+					String x = EmojiParser.parseToUnicode(":x:");
+					answerCallbackQuery.setText(x+SouthPoolConstantMessage.ADMIN_ONLY);
+					sendMessage(answerCallbackQuery);
+				}
+				break;
+				
+			case CallBackContants.COMPLAIN_MEMBER:
+				botQuestion = saveAndSendMessage(SouthPoolConstantMessage.COMPLAIN_MEMBER_PASSENGER_OR_DRIVER, previousMessage, username, PreviousMessage.class);
+				message.setText(botQuestion);
+				sendMessage(message);
+				break;
+				
 			case CallBackContants.TOMORROW_DRIVER:
 				message.setText(SouthPoolConstantMessage.FEATURE_NOT_AVAILABLE_YET);
 				sendMessage(message);
@@ -1390,7 +1495,7 @@ public class SouthPoolController extends TelegramLongPollingBot {
 
 			case CallBackContants.BOT_UPDATE:
 				try {
-					southPoolService.sendMessage(constantMessage.showThankUpdate(), southPoolSettings);
+					southPoolService.sendMessage(constantMessage.showThankUpdate(), southPoolSettings.getGroupChatId(), southPoolSettings);
 				} catch (UnsupportedEncodingException e) {
 					log.error("",e);
 				}
@@ -1542,7 +1647,7 @@ public class SouthPoolController extends TelegramLongPollingBot {
 			}
 			else {
 				try {
-					southPoolService.sendMessage(SouthPoolConstantMessage.showOrPostMyInformation(member), southPoolSettings);
+					southPoolService.sendMessage(SouthPoolConstantMessage.showOrPostMyInformation(member), southPoolSettings.getGroupChatId(), southPoolSettings);
 				} catch (UnsupportedEncodingException e) {
 					log.error("",e);
 				}
@@ -1583,7 +1688,7 @@ public class SouthPoolController extends TelegramLongPollingBot {
 		}
 		else {
 			try {
-				southPoolService.sendMessage(SouthPoolConstantMessage.showOrPostMyInformation(member), southPoolSettings);
+				southPoolService.sendMessage(SouthPoolConstantMessage.showOrPostMyInformation(member), southPoolSettings.getGroupChatId(), southPoolSettings);
 			} catch (UnsupportedEncodingException e) {
 				log.error("",e);
 			}

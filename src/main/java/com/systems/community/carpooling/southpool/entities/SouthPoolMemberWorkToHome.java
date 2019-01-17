@@ -83,4 +83,10 @@ public class SouthPoolMemberWorkToHome implements Serializable, Member {
 	
 	@Column(name="post_count")
 	private int postCount;
+	
+	@Column(name="allowed")
+	private String allowed;
+	
+	@Column(name="admin")
+	private String admin;
 }

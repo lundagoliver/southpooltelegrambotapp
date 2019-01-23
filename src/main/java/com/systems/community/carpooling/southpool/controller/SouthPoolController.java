@@ -26,6 +26,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.itextpdf.text.DocumentException;
+import com.systems.community.carpooling.southpool.entities.Followers;
 import com.systems.community.carpooling.southpool.entities.Member;
 import com.systems.community.carpooling.southpool.entities.MemberCars;
 import com.systems.community.carpooling.southpool.entities.PreviousMessage;
@@ -103,7 +104,7 @@ public class SouthPoolController extends TelegramLongPollingBot {
 		menuManager.addMenuItem(EmojiParser.parseToUnicode(":traffic_light: ") + "Report Traffic Status", CallBackContants.REPORT_TRAFFIC);
 		menuManager.addMenuItem(EmojiParser.parseToUnicode(":no_mobile_phones: ") + "Ban Member", CallBackContants.BAN_MEMBER);
 		menuManager.addMenuItem(EmojiParser.parseToUnicode(":interrobang: ") + "Complain a Member", CallBackContants.COMPLAIN_MEMBER);
-		
+
 		//menuManager.addMenuItem(EmojiParser.parseToUnicode(":bird: ") + "Bot Update", CallBackContants.BOT_UPDATE);
 		menuManager.init();
 
@@ -128,7 +129,8 @@ public class SouthPoolController extends TelegramLongPollingBot {
 		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":traffic_light: ") + "Report Traffic Status", CallBackContants.REPORT_TRAFFIC);
 		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":no_mobile_phones: ") + "Ban Member", CallBackContants.BAN_MEMBER);
 		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":interrobang: ") + "Complain a Member", CallBackContants.COMPLAIN_MEMBER);
-		
+		menuManagerUpdate.addMenuItem(EmojiParser.parseToUnicode(":+1: ") + "Follow a Member", CallBackContants.FOLLOW_MEMBER);
+
 		menuManagerUpdate.init();
 
 		menuManagerPost.setColumnsCount(2);
@@ -143,6 +145,7 @@ public class SouthPoolController extends TelegramLongPollingBot {
 		menuManagerPost.addMenuItem(EmojiParser.parseToUnicode(":white_check_mark: ") + "Verify Member", CallBackContants.VERIFY_MEMBER);
 		menuManagerPost.addMenuItem(EmojiParser.parseToUnicode(":interrobang: ") + "Complain a Member", CallBackContants.COMPLAIN_MEMBER);
 		menuManagerPost.addMenuItem(EmojiParser.parseToUnicode(":mag_right: ") + "Search", CallBackContants.SEARCH_POST);
+		menuManagerPost.addMenuItem(EmojiParser.parseToUnicode(":+1: ") + "Follow a Member", CallBackContants.FOLLOW_MEMBER);
 		menuManagerPost.init();
 
 		menuManagerSearch.setColumnsCount(2);
@@ -153,6 +156,7 @@ public class SouthPoolController extends TelegramLongPollingBot {
 		menuManagerSearch.addMenuItem(EmojiParser.parseToUnicode(":information_source: ") + "My Info", CallBackContants.SHOW_MEMBER_INFO);
 		menuManagerSearch.addMenuItem(EmojiParser.parseToUnicode(":traffic_light: ") + "Report Traffic Status", CallBackContants.REPORT_TRAFFIC);
 		menuManagerSearch.addMenuItem(EmojiParser.parseToUnicode(":interrobang: ") + "Complain a Member", CallBackContants.COMPLAIN_MEMBER);
+		menuManagerSearch.addMenuItem(EmojiParser.parseToUnicode(":+1: ") + "Follow a Member", CallBackContants.FOLLOW_MEMBER);
 		menuManagerSearch.init();
 
 
@@ -201,19 +205,19 @@ public class SouthPoolController extends TelegramLongPollingBot {
 		InlineKeyboardBuilderSearch builderSearch = menuManagerSearch.createMenuForPage(0, true);
 
 		if (update.hasMessage() && update.getMessage().hasText()) {
-			SendMessage message = new SendMessage();	
+
+			String username = update.getMessage().getChat().getUserName();
+			String messageText = update.getMessage().getText();
+			long chatId = update.getMessage().getChatId();
+
+			SendMessage message = new SendMessage();
+			message.setChatId(chatId).setParseMode("HTML");
 			ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
 			message.setReplyMarkup(replyKeyboardMarkup);
 			replyKeyboardMarkup.setSelective(true);
 			replyKeyboardMarkup.setResizeKeyboard(true);
 			replyKeyboardMarkup.setOneTimeKeyboard(true);
-
-			String username = update.getMessage().getChat().getUserName();
-			String messageText = update.getMessage().getText();
-			long chatId = update.getMessage().getChatId();
-			long messageId = update.getMessage().getMessageId();
-
-			message.setChatId(chatId).setParseMode("HTML");
+			
 			//Check if username is set already. If username is not yet set, show some information how to do it.
 			if (username == null) {
 				message.setText(constantMessage.userNameNotYetSetMessage());
@@ -238,6 +242,23 @@ public class SouthPoolController extends TelegramLongPollingBot {
 				message.setText(x+SouthPoolConstantMessage.BANNED_USER);
 				sendMessage(message);
 				return;
+			}
+			else if (messageText.startsWith("/unfollow__")) {
+				String[] command = messageText.split("__");
+				String userNameOfTheMemberYouFollowed = command[1];
+				
+				Map<String,String> uniqueConstraintNameValueMap = new HashMap<>();
+				uniqueConstraintNameValueMap.put("username", userNameOfTheMemberYouFollowed);
+				uniqueConstraintNameValueMap.put("follower", username);
+				Followers followers = persistenceService.getFolowerBy(uniqueConstraintNameValueMap, Followers.class).get(0);
+				if (followers == null) {
+					String x = EmojiParser.parseToUnicode(":x:");
+					message.setText(x+"Unknown username! @"+userNameOfTheMemberYouFollowed);
+					sendMessage(message);
+					return;
+				}
+				followers.setActive("N");
+				persistenceService.merge(followers);
 			}
 			else {
 				switch (messageText) {
@@ -596,7 +617,7 @@ public class SouthPoolController extends TelegramLongPollingBot {
 							persistenceService.merge(southPoolMemberWorkToHome);
 						}
 					}
-					
+
 					else if (SouthPoolConstantMessage.VERIFY_MEMBER.equals(previousUserMessage.getPrevMessage()) && CallBackContants.HOME_TO_WORK_INFO.equals(previousUserMessage.getTag())) {
 						String user = messageText.contains("@") ? messageText.replaceAll("@", "") : messageText; 
 						southPoolMemberHomeToWork = persistenceService.getMember(user, SouthPoolMemberHomeToWork.class);
@@ -618,7 +639,7 @@ public class SouthPoolController extends TelegramLongPollingBot {
 							message.setText("@"+user + " is not a SOUTHPOOL member!");
 							sendMessage(message);
 						}
-						
+
 					}
 
 					else if (SouthPoolConstantMessage.REPORT_TRAFFIC_STATUS.equals(previousUserMessage.getPrevMessage()) && CallBackContants.HOME_TO_WORK_INFO.equals(previousUserMessage.getTag()) || 
@@ -640,7 +661,7 @@ public class SouthPoolController extends TelegramLongPollingBot {
 							log.error("",e);
 						}
 					}
-					
+
 					else if (SouthPoolConstantMessage.COMPLAIN_MEMBER_PASSENGER_OR_DRIVER.equals(previousUserMessage.getPrevMessage()) && CallBackContants.HOME_TO_WORK_INFO.equals(previousUserMessage.getTag()) || 
 							SouthPoolConstantMessage.COMPLAIN_MEMBER_PASSENGER_OR_DRIVER.equals(previousUserMessage.getPrevMessage()) && CallBackContants.WORK_TO_HOME_INFO.equals(previousUserMessage.getTag())) {
 						StringBuilder report = new StringBuilder();
@@ -660,52 +681,88 @@ public class SouthPoolController extends TelegramLongPollingBot {
 						message.setReplyMarkup(SouthPoolConstantMessage.shownOptionsForWorkAndHomeInfo());
 						sendMessage(message);
 					}
-					
+
 					else if (SouthPoolConstantMessage.BAN_MEMBER_TO_USE_THE_BOT.equals(previousUserMessage.getPrevMessage()) && CallBackContants.HOME_TO_WORK_INFO.equals(previousUserMessage.getTag()) || 
 							SouthPoolConstantMessage.BAN_MEMBER_TO_USE_THE_BOT.equals(previousUserMessage.getPrevMessage()) && CallBackContants.WORK_TO_HOME_INFO.equals(previousUserMessage.getTag())) {
-						
-							String user = messageText.contains("@") ? messageText.replaceAll("@", "") : messageText;
-							southPoolMemberHomeToWork = persistenceService.getMember(user, SouthPoolMemberHomeToWork.class);
-							southPoolMemberWorkToHome = persistenceService.getMember(user, SouthPoolMemberWorkToHome.class);
-							if (southPoolMemberHomeToWork == null || southPoolMemberWorkToHome == null) {
-								message.setText("User with username " + user + " does not exist!");
-								sendMessage(message);	
+
+						String user = messageText.contains("@") ? messageText.replaceAll("@", "") : messageText;
+						southPoolMemberHomeToWork = persistenceService.getMember(user, SouthPoolMemberHomeToWork.class);
+						southPoolMemberWorkToHome = persistenceService.getMember(user, SouthPoolMemberWorkToHome.class);
+						if (southPoolMemberHomeToWork == null || southPoolMemberWorkToHome == null) {
+							message.setText("User with username " + user + " does not exist!");
+							sendMessage(message);	
+						}
+						else {
+							southPoolMemberHomeToWork.setAllowed("N");
+							persistenceService.merge(southPoolMemberHomeToWork);
+							southPoolMemberWorkToHome.setAllowed("N");
+							persistenceService.merge(southPoolMemberWorkToHome);
+
+							StringBuilder report = new StringBuilder();
+							report.append("<b>BANNED MEMBER</>").append("\n\n");
+							report.append("Details : ").append("\n\n");
+							report.append("<i>").append(user + " is banned from SOUTHPOOL community!").append("</i>\n\n");
+							report.append("Banned by: @"+username).append("\n");
+							try {
+								southPoolService.sendMessageToAdmin(report.toString(),southPoolSettings.getGroupChatIdAdmins(), southPoolSettings);
+							} catch (UnsupportedEncodingException e) {
+								log.error("{}", e);
 							}
-							else {
-								southPoolMemberHomeToWork.setAllowed("N");
-								persistenceService.merge(southPoolMemberHomeToWork);
-								southPoolMemberWorkToHome.setAllowed("N");
-								persistenceService.merge(southPoolMemberWorkToHome);
-								
-								StringBuilder report = new StringBuilder();
-								report.append("<b>BANNED MEMBER</>").append("\n\n");
-								report.append("Details : ").append("\n\n");
-								report.append("<i>").append(user + " is banned from SOUTHPOOL community!").append("</i>\n\n");
-								report.append("Banned by: @"+username).append("\n");
-								try {
-									southPoolService.sendMessageToAdmin(report.toString(),southPoolSettings.getGroupChatIdAdmins(), southPoolSettings);
-								} catch (UnsupportedEncodingException e) {
-									log.error("{}", e);
-								}
-								
-								String ok = EmojiParser.parseToUnicode(":white_check_mark:");
-								message.setText(ok+SouthPoolConstantMessage.BANNED);
-								sendMessage(message);
-							}
-							message.setText("Please select information to use, register or update :");
-							message.setReplyMarkup(SouthPoolConstantMessage.shownOptionsForWorkAndHomeInfo());
+
+							String ok = EmojiParser.parseToUnicode(":white_check_mark:");
+							message.setText(ok+SouthPoolConstantMessage.BANNED);
 							sendMessage(message);
+						}
+						message.setText("Please select information to use, register or update :");
+						message.setReplyMarkup(SouthPoolConstantMessage.shownOptionsForWorkAndHomeInfo());
+						sendMessage(message);
 					}
-					
-					if ( !SouthPoolConstantMessage.COMPLAIN_MEMBER_PASSENGER_OR_DRIVER.equals(previousUserMessage.getPrevMessage()) &&
-							!SouthPoolConstantMessage.BAN_MEMBER_TO_USE_THE_BOT.equals(previousUserMessage.getPrevMessage()) &&
-							!SouthPoolConstantMessage.REPORT_TRAFFIC_STATUS.equals(previousUserMessage.getPrevMessage()) 
+
+					else if (SouthPoolConstantMessage.FOLLW_A_MEMBER.equals(previousUserMessage.getPrevMessage()) && CallBackContants.HOME_TO_WORK_INFO.equals(previousUserMessage.getTag()) || 
+							SouthPoolConstantMessage.FOLLW_A_MEMBER.equals(previousUserMessage.getPrevMessage()) && CallBackContants.WORK_TO_HOME_INFO.equals(previousUserMessage.getTag())) {
+
+						String user = messageText.contains("@") ? messageText.replaceAll("@", "") : messageText;
+						southPoolMemberHomeToWork = persistenceService.getMember(username, SouthPoolMemberHomeToWork.class);
+						southPoolMemberWorkToHome = persistenceService.getMember(username, SouthPoolMemberWorkToHome.class);
+
+						String chatIdOfFollower = southPoolMemberHomeToWork.getUsername() != null ? southPoolMemberHomeToWork.getChatId() : southPoolMemberWorkToHome.getChatId() != null ? southPoolMemberWorkToHome.getChatId() : "";
+
+						Map<String,String> uniqueConstraintNameValueMap = new HashMap<>();
+						uniqueConstraintNameValueMap.put("username", user);
+						uniqueConstraintNameValueMap.put("follower", username);
+						Followers follower;
+						if (persistenceService.findByUniqueConstraint(uniqueConstraintNameValueMap, Followers.class)) {
+							follower = (Followers) persistenceService.getFolowerBy(uniqueConstraintNameValueMap, Followers.class).get(0);
+							follower.setActive("Y");
+							persistenceService.merge(follower);
+							String ok = EmojiParser.parseToUnicode(":white_check_mark:");
+							message.setText(ok+SouthPoolConstantMessage.ALREADY_FOLLOWED);
+							sendMessage(message);
+						}
+						else {
+							follower = new Followers();
+							follower.setUsername(user);
+							follower.setFollower(username);
+							follower.setChatId(chatIdOfFollower);
+							follower.setActive("Y");
+							persistenceService.persist(follower);
+
+							String ok = EmojiParser.parseToUnicode(":white_check_mark:");
+							message.setText(ok+SouthPoolConstantMessage.FOLLOWED);
+							sendMessage(message);
+						}
+					}
+
+					if ( !SouthPoolConstantMessage.FOLLW_A_MEMBER.equals(previousUserMessage.getPrevMessage()) 
+							&& !SouthPoolConstantMessage.COMPLAIN_MEMBER_PASSENGER_OR_DRIVER.equals(previousUserMessage.getPrevMessage()) 
+							&& !SouthPoolConstantMessage.BAN_MEMBER_TO_USE_THE_BOT.equals(previousUserMessage.getPrevMessage()) 
+							&& !SouthPoolConstantMessage.REPORT_TRAFFIC_STATUS.equals(previousUserMessage.getPrevMessage()) 
 							&& !SouthPoolConstantMessage.VERIFY_MEMBER.equals(previousUserMessage.getPrevMessage()) 
 							&& CallBackContants.HOME_TO_WORK_INFO.equals(previousUserMessage.getTag())) {
 						sendMessage(continuousSaveAndSendMessage(message, replyKeyboardMarkup, southPoolMemberHomeToWork, previousUserMessage, username, PreviousMessage.class));
 
 						if (!isInfoNotComplete(southPoolMemberHomeToWork)) {
-							message.setText("Please see your updated HOME to WORK Information below.");
+							message.setText("Please see your updated HOME to WORK Information below.\n\n");
 							sendMessage(message);
 							builderUpdate.setParse("HTML").setChatId(chatId).setText(SouthPoolConstantMessage.showMyInformation(southPoolMemberHomeToWork)+SouthPoolConstantMessage.PLEASE_CHOOSE_ACTION);
 							sendMessage(builderUpdate.build());
@@ -722,7 +779,8 @@ public class SouthPoolController extends TelegramLongPollingBot {
 							}
 						}	
 					}
-					else if (!SouthPoolConstantMessage.COMPLAIN_MEMBER_PASSENGER_OR_DRIVER.equals(previousUserMessage.getPrevMessage()) 
+					else if (!SouthPoolConstantMessage.FOLLW_A_MEMBER.equals(previousUserMessage.getPrevMessage()) 
+							&& !SouthPoolConstantMessage.COMPLAIN_MEMBER_PASSENGER_OR_DRIVER.equals(previousUserMessage.getPrevMessage()) 
 							&& !SouthPoolConstantMessage.BAN_MEMBER_TO_USE_THE_BOT.equals(previousUserMessage.getPrevMessage()) 
 							&& !SouthPoolConstantMessage.REPORT_TRAFFIC_STATUS.equals(previousUserMessage.getPrevMessage()) 
 							&& !SouthPoolConstantMessage.VERIFY_MEMBER.equals(previousUserMessage.getPrevMessage()) 
@@ -730,7 +788,7 @@ public class SouthPoolController extends TelegramLongPollingBot {
 						sendMessage(continuousSaveAndSendMessage(message, replyKeyboardMarkup, southPoolMemberWorkToHome, previousUserMessage, username, PreviousMessage.class));
 
 						if (!isInfoNotComplete(southPoolMemberWorkToHome)) {
-							message.setText("Please see your updated WORK to HOME Information below.");
+							message.setText("Please see your updated WORK to HOME Information below.\n\n");
 							sendMessage(message);
 							builderUpdate.setChatId(chatId).setText(SouthPoolConstantMessage.showMyInformation(southPoolMemberWorkToHome)+SouthPoolConstantMessage.PLEASE_CHOOSE_ACTION);
 							sendMessage(builderUpdate.build());
@@ -796,7 +854,23 @@ public class SouthPoolController extends TelegramLongPollingBot {
 			SouthPoolMemberHomeToWork southPoolMemberHomeToWork = persistenceService.getMember(username, SouthPoolMemberHomeToWork.class);
 			SouthPoolMemberWorkToHome southPoolMemberWorkToHome = persistenceService.getMember(username, SouthPoolMemberWorkToHome.class);
 			
-			if (southPoolMemberWorkToHome != null && southPoolMemberWorkToHome != null) {
+			if (southPoolMemberHomeToWork != null && southPoolMemberWorkToHome != null) {
+				
+				if (southPoolMemberHomeToWork.getChatId() == null) {
+					southPoolMemberHomeToWork.setChatId(String.valueOf(chatId));
+					persistenceService.merge(southPoolMemberHomeToWork);	
+				}
+				if (southPoolMemberWorkToHome.getChatId() == null) {
+					southPoolMemberWorkToHome.setChatId(String.valueOf(chatId));
+					persistenceService.merge(southPoolMemberWorkToHome);	
+				}
+
+				southPoolMemberHomeToWork = persistenceService.getMember(username, SouthPoolMemberHomeToWork.class);
+				southPoolMemberWorkToHome = persistenceService.getMember(username, SouthPoolMemberWorkToHome.class);				
+			}
+
+
+			if (southPoolMemberHomeToWork != null && southPoolMemberWorkToHome != null) {
 				if ("N".equalsIgnoreCase(southPoolMemberHomeToWork.getAllowed()) || "N".equalsIgnoreCase(southPoolMemberWorkToHome.getAllowed())) {
 					String x = EmojiParser.parseToUnicode(":x:");
 					message.setText(x+SouthPoolConstantMessage.BANNED_USER);
@@ -810,7 +884,7 @@ public class SouthPoolController extends TelegramLongPollingBot {
 
 				if (!isInfoNotComplete(southPoolMemberHomeToWork)) {
 
-					message.setText("Please see your HOME to WORK Information below.");
+					message.setText("Please see your HOME to WORK Information below.\n\n");
 					sendMessage(message);
 
 
@@ -843,7 +917,7 @@ public class SouthPoolController extends TelegramLongPollingBot {
 
 				if (!isInfoNotComplete(southPoolMemberWorkToHome)) {
 
-					message.setText("Please see your WORK to HOME Information below.");
+					message.setText("Please see your WORK to HOME Information below.\n\n");
 					sendMessage(message);
 
 					builderUpdate.setChatId(chatId).setText(SouthPoolConstantMessage.showMyInformation(southPoolMemberWorkToHome)+SouthPoolConstantMessage.PLEASE_CHOOSE_ACTION);
@@ -912,13 +986,21 @@ public class SouthPoolController extends TelegramLongPollingBot {
 				if (southPoolMemberHomeToWork == null) {
 					southPoolMemberHomeToWork = new SouthPoolMemberHomeToWork();
 					southPoolMemberHomeToWork.setUsername(username);
+					southPoolMemberHomeToWork.setChatId(String.valueOf(chatId));
 					southPoolMemberHomeToWork.setPostCount(0);
+					southPoolMemberHomeToWork.setAllowed("Y");
+					southPoolMemberHomeToWork.setAdmin("N");
+					southPoolMemberHomeToWork.setChatId(String.valueOf(chatId));
 					persistenceService.persist(southPoolMemberHomeToWork);	
 				}
 				if (southPoolMemberWorkToHome == null) {
 					southPoolMemberWorkToHome = new SouthPoolMemberWorkToHome();
 					southPoolMemberWorkToHome.setUsername(username);
 					southPoolMemberWorkToHome.setPostCount(0);
+					southPoolMemberWorkToHome.setChatId(String.valueOf(chatId));
+					southPoolMemberWorkToHome.setAllowed("Y");
+					southPoolMemberWorkToHome.setAdmin("N");
+					southPoolMemberWorkToHome.setChatId(String.valueOf(chatId));
 					persistenceService.persist(southPoolMemberWorkToHome);	
 				}
 				message.setText("Please select information to use, register or update :");
@@ -1085,12 +1167,26 @@ public class SouthPoolController extends TelegramLongPollingBot {
 				break;
 
 			case CallBackContants.POST_REQUEST:
+				southPoolMemberHomeToWork = persistenceService.getMember(username, SouthPoolMemberHomeToWork.class);
+				southPoolMemberWorkToHome = persistenceService.getMember(username, SouthPoolMemberWorkToHome.class);
+
+				if (southPoolMemberHomeToWork.getChatId() == null) {
+					southPoolMemberHomeToWork.setChatId(String.valueOf(chatId));
+					persistenceService.merge(southPoolMemberHomeToWork);	
+				}
+				if (southPoolMemberWorkToHome.getChatId() == null) {
+					southPoolMemberWorkToHome.setChatId(String.valueOf(chatId));
+					persistenceService.merge(southPoolMemberWorkToHome);	
+				}
+
+				southPoolMemberHomeToWork = persistenceService.getMember(username, SouthPoolMemberHomeToWork.class);
+				southPoolMemberWorkToHome = persistenceService.getMember(username, SouthPoolMemberWorkToHome.class);
 				if (CallBackContants.HOME_TO_WORK_INFO.equals(previousMessage.getTag())) {
-					message.setText("HOME to WORK Information\n"+SouthPoolConstantMessage.showOrPostMyInformation(southPoolMemberHomeToWork));
+					message.setText("HOME to WORK Information\n\n"+SouthPoolConstantMessage.showOrPostMyInformation(southPoolMemberHomeToWork));
 					sendMessage(message);
 				}
 				else if (CallBackContants.WORK_TO_HOME_INFO.equals(previousMessage.getTag())) {
-					message.setText("WORK to HOME Information\n"+SouthPoolConstantMessage.showOrPostMyInformation(southPoolMemberWorkToHome));
+					message.setText("WORK to HOME Information\n\n"+SouthPoolConstantMessage.showOrPostMyInformation(southPoolMemberWorkToHome));
 					sendMessage(message);	
 				}
 				builderPost.setChatId(chatId).setText("Please review your information above before posting your request.\nPlease Choose action:");
@@ -1098,6 +1194,22 @@ public class SouthPoolController extends TelegramLongPollingBot {
 				break;
 
 			case CallBackContants.POST_AS_DRIVER:
+
+				southPoolMemberHomeToWork = persistenceService.getMember(username, SouthPoolMemberHomeToWork.class);
+				southPoolMemberWorkToHome = persistenceService.getMember(username, SouthPoolMemberWorkToHome.class);
+
+				if (southPoolMemberHomeToWork.getChatId() == null) {
+					southPoolMemberHomeToWork.setChatId(String.valueOf(chatId));
+					persistenceService.merge(southPoolMemberHomeToWork);	
+				}
+				if (southPoolMemberWorkToHome.getChatId() == null) {
+					southPoolMemberWorkToHome.setChatId(String.valueOf(chatId));
+					persistenceService.merge(southPoolMemberWorkToHome);	
+				}
+
+				southPoolMemberHomeToWork = persistenceService.getMember(username, SouthPoolMemberHomeToWork.class);
+				southPoolMemberWorkToHome = persistenceService.getMember(username, SouthPoolMemberWorkToHome.class);
+
 				if (CallBackContants.HOME_TO_WORK_INFO.equals(previousMessage.getTag())) {
 					if (southPoolMemberHomeToWork.getPostCount() == 5) {
 						String warning = EmojiParser.parseToUnicode(":warning:");
@@ -1133,6 +1245,9 @@ public class SouthPoolController extends TelegramLongPollingBot {
 					}
 					southPoolMemberHomeToWork = persistenceService.getMember(username, SouthPoolMemberHomeToWork.class);
 					postRequestAsDriver(message,predicatesMap,southPoolMemberHomeToWork,username, answerCallbackQuery);
+
+
+
 					southPoolMemberHomeToWork.setPostCount(southPoolMemberHomeToWork.getPostCount() == 0 ? 1 : southPoolMemberHomeToWork.getPostCount() + 1);
 					persistenceService.merge(southPoolMemberHomeToWork);
 				}
@@ -1177,6 +1292,22 @@ public class SouthPoolController extends TelegramLongPollingBot {
 				break;
 
 			case CallBackContants.POST_AS_PASSENGER:
+
+				southPoolMemberHomeToWork = persistenceService.getMember(username, SouthPoolMemberHomeToWork.class);
+				southPoolMemberWorkToHome = persistenceService.getMember(username, SouthPoolMemberWorkToHome.class);
+
+				if (southPoolMemberHomeToWork.getChatId() == null) {
+					southPoolMemberHomeToWork.setChatId(String.valueOf(chatId));
+					persistenceService.merge(southPoolMemberHomeToWork);	
+				}
+				if (southPoolMemberWorkToHome.getChatId() == null) {
+					southPoolMemberWorkToHome.setChatId(String.valueOf(chatId));
+					persistenceService.merge(southPoolMemberWorkToHome);	
+				}
+
+				southPoolMemberHomeToWork = persistenceService.getMember(username, SouthPoolMemberHomeToWork.class);
+				southPoolMemberWorkToHome = persistenceService.getMember(username, SouthPoolMemberWorkToHome.class);
+
 				if (CallBackContants.HOME_TO_WORK_INFO.equals(previousMessage.getTag())) {
 					if (southPoolMemberHomeToWork.getPostCount() == 5) {
 						String warning = EmojiParser.parseToUnicode(":warning:");
@@ -1256,6 +1387,22 @@ public class SouthPoolController extends TelegramLongPollingBot {
 				break;
 
 			case CallBackContants.POST_AS_DRIVER_TOMORROW:
+
+				southPoolMemberHomeToWork = persistenceService.getMember(username, SouthPoolMemberHomeToWork.class);
+				southPoolMemberWorkToHome = persistenceService.getMember(username, SouthPoolMemberWorkToHome.class);
+
+				if (southPoolMemberHomeToWork.getChatId() == null) {
+					southPoolMemberHomeToWork.setChatId(String.valueOf(chatId));
+					persistenceService.merge(southPoolMemberHomeToWork);	
+				}
+				if (southPoolMemberWorkToHome.getChatId() == null) {
+					southPoolMemberWorkToHome.setChatId(String.valueOf(chatId));
+					persistenceService.merge(southPoolMemberWorkToHome);	
+				}
+
+				southPoolMemberHomeToWork = persistenceService.getMember(username, SouthPoolMemberHomeToWork.class);
+				southPoolMemberWorkToHome = persistenceService.getMember(username, SouthPoolMemberWorkToHome.class);
+
 				if (CallBackContants.HOME_TO_WORK_INFO.equals(previousMessage.getTag())) {
 					if (southPoolMemberHomeToWork.getPostCount() == 5) {
 						String warning = EmojiParser.parseToUnicode(":warning:");
@@ -1269,7 +1416,7 @@ public class SouthPoolController extends TelegramLongPollingBot {
 						String[] etaTime = southPoolMemberHomeToWork.getEta().split(" ");
 						String eta = dateToday + " " + etaTime[1];
 
-						String[] etdTime = southPoolMemberHomeToWork.getEta().split(" ");
+						String[] etdTime = southPoolMemberHomeToWork.getEtd().split(" ");
 						String etd = dateToday + " " + etdTime[1];
 
 						southPoolMemberHomeToWork.setEta(eta);
@@ -1306,7 +1453,7 @@ public class SouthPoolController extends TelegramLongPollingBot {
 						String[] etaTime = southPoolMemberWorkToHome.getEta().split(" ");
 						String eta = dateToday + " " + etaTime[1];
 
-						String[] etdTime = southPoolMemberWorkToHome.getEta().split(" ");
+						String[] etdTime = southPoolMemberWorkToHome.getEtd().split(" ");
 						String etd = dateToday + " " + etdTime[1];
 
 						southPoolMemberWorkToHome.setEta(eta);
@@ -1327,12 +1474,29 @@ public class SouthPoolController extends TelegramLongPollingBot {
 
 					southPoolMemberWorkToHome = persistenceService.getMember(username, SouthPoolMemberWorkToHome.class);
 					postRequestAsDriver(message,predicatesMap,southPoolMemberWorkToHome,username, answerCallbackQuery);
+
 					southPoolMemberWorkToHome.setPostCount(southPoolMemberWorkToHome.getPostCount() == 0 ? 1 : southPoolMemberWorkToHome.getPostCount() + 1);
 					persistenceService.merge(southPoolMemberWorkToHome);
 				}
 				break;
 
 			case CallBackContants.POST_AS_PASSENGER_TOMORROW:
+
+				southPoolMemberHomeToWork = persistenceService.getMember(username, SouthPoolMemberHomeToWork.class);
+				southPoolMemberWorkToHome = persistenceService.getMember(username, SouthPoolMemberWorkToHome.class);
+
+				if (southPoolMemberHomeToWork.getChatId() == null) {
+					southPoolMemberHomeToWork.setChatId(String.valueOf(chatId));
+					persistenceService.merge(southPoolMemberHomeToWork);	
+				}
+				if (southPoolMemberWorkToHome.getChatId() == null) {
+					southPoolMemberWorkToHome.setChatId(String.valueOf(chatId));
+					persistenceService.merge(southPoolMemberWorkToHome);	
+				}
+
+				southPoolMemberHomeToWork = persistenceService.getMember(username, SouthPoolMemberHomeToWork.class);
+				southPoolMemberWorkToHome = persistenceService.getMember(username, SouthPoolMemberWorkToHome.class);
+
 				if (CallBackContants.HOME_TO_WORK_INFO.equals(previousMessage.getTag())) {
 					if (southPoolMemberHomeToWork.getPostCount() == 5) {
 						String warning = EmojiParser.parseToUnicode(":warning:");
@@ -1346,7 +1510,7 @@ public class SouthPoolController extends TelegramLongPollingBot {
 						String[] etaTime = southPoolMemberHomeToWork.getEta().split(" ");
 						String eta = dateToday + " " + etaTime[1];
 
-						String[] etdTime = southPoolMemberHomeToWork.getEta().split(" ");
+						String[] etdTime = southPoolMemberHomeToWork.getEtd().split(" ");
 						String etd = dateToday + " " + etdTime[1];
 
 						southPoolMemberHomeToWork.setEta(eta);
@@ -1383,7 +1547,7 @@ public class SouthPoolController extends TelegramLongPollingBot {
 						String[] etaTime = southPoolMemberWorkToHome.getEta().split(" ");
 						String eta = dateToday + " " + etaTime[1];
 
-						String[] etdTime = southPoolMemberWorkToHome.getEta().split(" ");
+						String[] etdTime = southPoolMemberWorkToHome.getEtd().split(" ");
 						String etd = dateToday + " " + etdTime[1];
 
 						southPoolMemberHomeToWork.setEta(eta);
@@ -1461,13 +1625,13 @@ public class SouthPoolController extends TelegramLongPollingBot {
 				message.setText(botQuestion);
 				sendMessage(message);
 				break;
-				
+
 			case CallBackContants.REPORT_TRAFFIC:
 				botQuestion = saveAndSendMessage(SouthPoolConstantMessage.REPORT_TRAFFIC_STATUS, previousMessage, username, PreviousMessage.class);
 				message.setText(botQuestion);
 				sendMessage(message);
 				break;
-				
+
 			case CallBackContants.BAN_MEMBER:
 				if ("Y".equalsIgnoreCase(southPoolMemberHomeToWork.getAdmin()) && "Y".equalsIgnoreCase(southPoolMemberWorkToHome.getAdmin())) {
 					botQuestion = saveAndSendMessage(SouthPoolConstantMessage.BAN_MEMBER_TO_USE_THE_BOT, previousMessage, username, PreviousMessage.class);
@@ -1480,13 +1644,30 @@ public class SouthPoolController extends TelegramLongPollingBot {
 					sendMessage(answerCallbackQuery);
 				}
 				break;
-				
+
 			case CallBackContants.COMPLAIN_MEMBER:
 				botQuestion = saveAndSendMessage(SouthPoolConstantMessage.COMPLAIN_MEMBER_PASSENGER_OR_DRIVER, previousMessage, username, PreviousMessage.class);
 				message.setText(botQuestion);
 				sendMessage(message);
 				break;
-				
+
+			case CallBackContants.FOLLOW_MEMBER:
+				if (southPoolMemberHomeToWork != null && southPoolMemberWorkToHome != null) {
+					
+					if (southPoolMemberHomeToWork.getChatId() == null) {
+						southPoolMemberHomeToWork.setChatId(String.valueOf(chatId));
+						persistenceService.merge(southPoolMemberHomeToWork);	
+					}
+					if (southPoolMemberWorkToHome.getChatId() == null) {
+						southPoolMemberWorkToHome.setChatId(String.valueOf(chatId));
+						persistenceService.merge(southPoolMemberWorkToHome);	
+					}			
+				}
+				botQuestion = saveAndSendMessage(SouthPoolConstantMessage.FOLLW_A_MEMBER, previousMessage, username, PreviousMessage.class);
+				message.setText(botQuestion);
+				sendMessage(message);
+				break;
+
 			case CallBackContants.TOMORROW_DRIVER:
 				message.setText(SouthPoolConstantMessage.FEATURE_NOT_AVAILABLE_YET);
 				sendMessage(message);
@@ -1663,6 +1844,22 @@ public class SouthPoolController extends TelegramLongPollingBot {
 				message.setText(SouthPoolConstantMessage.SELECT_INFO);
 				message.setReplyMarkup(SouthPoolConstantMessage.shownOptionsForWorkAndHomeInfo());
 				sendMessage(message);
+
+				//notify the followers
+				Map<String,String> uniqueConstraintNameValueMap = new HashMap<>();
+				uniqueConstraintNameValueMap.put("username", username);
+				List<Followers> followers = persistenceService.getFolowerBy(uniqueConstraintNameValueMap, Followers.class);
+				for (Followers follower : followers) {
+					if (!"Y".equals(follower.getActive())) {
+						continue;
+					}
+					try {
+						southPoolService.sendMessageToFollowers(SouthPoolConstantMessage.showOrPostMyInformationToFollower(member), follower.getChatId(), southPoolSettings);
+					} catch (UnsupportedEncodingException e) {
+						log.error("",e);
+					}
+				}
+
 				return true;
 			}
 		}

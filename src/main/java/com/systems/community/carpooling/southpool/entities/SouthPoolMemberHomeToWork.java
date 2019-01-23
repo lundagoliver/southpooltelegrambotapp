@@ -88,4 +88,7 @@ public class SouthPoolMemberHomeToWork implements Serializable, Member {
 	
 	@Column(name="admin")
 	private String admin;
+	
+	@Column(name="chat_id")
+	private String chatId;
 }

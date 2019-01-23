@@ -112,6 +112,26 @@ public class MemberDAO {
 		return typedQuery.getResultList();
 	}
 	
+	
+	public <T extends Member> List<T> getFolowerBy(Map<String, String> predicatesMap, Class<T> clazz) {
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<T> cq = cb.createQuery(clazz);
+		Root<T> from = cq.from(clazz);
+		
+		List<Predicate> predicateList = new ArrayList<>();
+		for(Entry<String, String> entry : predicatesMap.entrySet()) {
+			String key = entry.getKey();
+			Object value = entry.getValue();
+			
+			predicateList.add(cb.equal(from.get(key), value));
+		}
+		
+		cq.where(cb.and(predicateList.toArray(new Predicate[predicateList.size()])));
+		CriteriaQuery<T> select = cq.select(from);
+		TypedQuery<T> typedQuery = em.createQuery(select);
+		return typedQuery.getResultList();
+	}
+	
 	public <T extends Member> List<T> getMembersBetweenDate(String dateColumn, Date startDate, Date endDate, Map<String, String> predicatesMap, Class<T> clazz) {
 		if (predicatesMap.containsKey("username")) {
 			predicatesMap.remove("username");

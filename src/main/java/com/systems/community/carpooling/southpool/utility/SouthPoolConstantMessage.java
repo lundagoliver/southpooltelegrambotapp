@@ -15,7 +15,7 @@ import com.vdurmont.emoji.EmojiParser;
 
 @Component
 public class SouthPoolConstantMessage {
-	
+
 	public static final String ENTER_YOUR_NAME = "\n\nPlease enter your name :";
 	public static final String ENTER_FACEBOOK_PROFILE_LINK = "Please enter your profile link :";
 	public static final String ENTER_MOBILE_NUMBER = "Please enter your mobile number :";
@@ -35,20 +35,23 @@ public class SouthPoolConstantMessage {
 	public static final String ADMIN_ONLY = "Only the administrators can ban a member. Please use \"Complain a Member\" to report a member.Thank you!\n\n";
 	public static final String REPORT_POSTED = "Your report was successfully posted in SOUTHPOOL telegram group carpooling community.Thank you!\n\n";
 	public static final String BANNED = "User was successfully banned from using SOUTHPOOL telegram group carpooling community.Thank you!\n\n";
+	public static final String FOLLOWED = "You have successfully followed this member. You will receive a notification everytime this member post a request.Thank you!\n\n";
+	public static final String ALREADY_FOLLOWED = "You are already following this member.Thank you!\n\n";
 	public static final String BANNED_USER = "You are banned from using SOUTHPOOL telegram group carpooling community. Please contact the administrators. Thank you!\n\n";
 	public static final String RESQUEST_MAX = "Sorry, you have reached the maximum allowable limit to post a request for this day.You may try again tomorrow.Thank you!\n\n";
 
 	public static final String FEATURE_NOT_AVAILABLE_YET = "This feature will be available on future releases. Thank you for your patience.\n";
-	
+
 	public static final String VERIFY_MEMBER = "Please enter the username of the member that you want to verify :\n";
 	public static final String REPORT_TRAFFIC_STATUS = "Please enter any traffic related information that you want to share in the group.\n\n Example:\n oil price hike/rollback, traffic status or any MMDA operations:\n";
 	public static final String BAN_MEMBER_TO_USE_THE_BOT = "Please enter the username of the member that you want to ban from using southpool :\n";
 	public static final String COMPLAIN_MEMBER_PASSENGER_OR_DRIVER = "Please enter your complain to a passenger or to a driver. This complain will be directly send to the southpool administors only:\n";
+	public static final String FOLLW_A_MEMBER = "Please enter the telegram username of the member that you want to follow:\n ex: @OliverDela_cruzLundag";
 	public static final String POSTED_COMPLAIN_MEMBER_PASSENGER_OR_DRIVER = "Your complain was successfully sent to the SOUTHPOOL administrators. Rest assured that this will be reviewed by the admins and will give necessary action to your concern. Thank you for your cooperation.\n";
-	
+
 	public static final String SEARCH_DRIVER = "Searching for DRIVER. Please wait...";
 	public static final String SEARCH_PASSENGER = "Searching for PASSENGER. Please wait...";
-	
+
 	public static final String SELECT_INFO = "Please select which information to use:";
 	public static final String PLEASE_CHOOSE_ACTION = "\nPlease Choose action:";
 
@@ -83,14 +86,14 @@ public class SouthPoolConstantMessage {
 		messageBuilder.append("Thank you for your cooperation.\n");
 		return messageBuilder.toString();
 	}
-	
+
 	public String showThankUpdate() {
 		StringBuilder messageBuilder = new StringBuilder();
 		messageBuilder.append("Hi SOUTHPOOL members,").append("\n");
 		messageBuilder.append("Good AM :)\n");
 		messageBuilder.append("Happy to share with you some of the @southpoolservicebot functionality updates.\n\n");
-		messageBuilder.append("1. Ban Member - Only the administrators can ban a member.\n\n");
-		messageBuilder.append("2. Complain a Member - You may now send your complains directly to the southpool administrators.\n Rest assured that this will be reviewed by the admins and will give necessary action to your concern. Thank you for your cooperation.");
+		messageBuilder.append("1. Follow a Member - You can now follow a member by just clicking or tapping the (Follow a Member) button. You just need to enter the telegram username of the member that you want to follow and then once you have followed the member, you will receive a notification everytime they have a successful request in southpool.\n\n\n");
+		messageBuilder.append("Pede nyo na po matry, sample may regular or kahit hindi regular passengers or drivers kayo na naka register sa southpool. You can ask them to enter your telegram username once ni choose nila yung Follow a Member button. Makaka recieve sila ng notification directly sa service bot once nag post yung ni follow nila na member in real time. :)Or if you want to follow them back makaka receive naman kayo ng notification once sila naman ang mag post.");
 		messageBuilder.append(" \n\n");
 		messageBuilder.append("Contact if you have any questions, concerns or issues about the bot.\n");
 		messageBuilder.append("👤 Creator").append("\n");
@@ -204,7 +207,7 @@ public class SouthPoolConstantMessage {
 	}
 
 	public String showInfoToUpdate(Member member) {
-		
+
 		String setName = EmojiParser.parseToUnicode(":information_source: ");
 		String setFaceBookProfile = EmojiParser.parseToUnicode(":computer: ");
 		String setMobileNumber = EmojiParser.parseToUnicode(":iphone: ");
@@ -217,7 +220,7 @@ public class SouthPoolConstantMessage {
 		String eta = EmojiParser.parseToUnicode(":airplane_arrival: ");
 		String etd = EmojiParser.parseToUnicode(":airplane_departure: ");
 		String specialInstruction = EmojiParser.parseToUnicode(":heavy_exclamation_mark: ");
-		
+
 		StringBuilder sb = new StringBuilder();
 		sb.append("I believe you need to set and complete your information.\n");
 		sb.append("You can update your information by sending, clicking or tapping these commands:\n\n");
@@ -325,18 +328,18 @@ public class SouthPoolConstantMessage {
 		}
 		return UPDATED;
 	}
-	
+
 	public static String showMyInformation(Member member) {
 
 		String etaDate = DateUtility.toLocaDateTime(member.getEta()).format(DateUtility.FORMAT_DATETIME_INFO);
 		String etdDate = DateUtility.toLocaDateTime(member.getEtd()).format(DateUtility.FORMAT_DATETIME_INFO);
-		
+
 		String message = etaDate.contains("PM") ? " here later!" : " here for today!";
-		
+
 		if (LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0).isBefore(DateUtility.toLocaDateTime(member.getEta()).withHour(0).withMinute(0).withSecond(0).withNano(0))) {
 			message = " here for tomorrow!";
 		}
-		
+
 		StringBuilder sb = new StringBuilder();
 		sb.append(member.getYouAre()).append(message).append("\n");
 		sb.append("Name: ").append(member.getName()).append("\n");
@@ -344,22 +347,22 @@ public class SouthPoolConstantMessage {
 		sb.append("Profile : ").append(member.getFacebookProfileLink()).append("\n");	
 		sb.append("Mobile: ").append(member.getMobileNumber()).append("\n");		
 		if(CallBackContants.DRIVER.equals(member.getYouAre())) {
-				sb.append("Plate: ").append(member.getCarPlateNumber()).append("\n");
+			sb.append("Plate: ").append(member.getCarPlateNumber()).append("\n");
 		}
 		sb.append("Pick Up: ").append(member.getPicUpLoc()).append("\n");
 		sb.append("Drop Off: ").append(member.getDropOffLoc()).append("\n");
 		sb.append("Route: ").append(member.getRoute()).append("\n");
 		sb.append("Seat: ").append(member.getAvailableSlots()).append("\n");
-		
+
 		sb.append("Date: ").append(etaDate.split(" ")[0]).append("\n");
 		String etaTime = TimeUtility.convertToStandardTime(etaDate.split(" ")[1],etaDate.split(" ")[2]);
 		String etdTime = TimeUtility.convertToStandardTime(etdDate.split(" ")[1],etdDate.split(" ")[2]);
 		sb.append("Time: ").append(etaTime +" - "+ etdTime).append("\n");
 		sb.append("Instruction: ").append(member.getCustomMessage()).append("\n");
-		
+
 		return sb.toString();
 	}
-	
+
 	public static String verifyMember(Member member) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("This member is verified as a " + member.getYouAre()).append("\n\n");
@@ -368,30 +371,30 @@ public class SouthPoolConstantMessage {
 		sb.append("Profile : ").append(member.getFacebookProfileLink()).append("\n");	
 		sb.append("Mobile: ").append(member.getMobileNumber()).append("\n");		
 		if(CallBackContants.DRIVER.equals(member.getYouAre())) {
-				sb.append("Plate: ").append(member.getCarPlateNumber()).append("\n");
+			sb.append("Plate: ").append(member.getCarPlateNumber()).append("\n");
 		}
 		return sb.toString();
 	}
 
 
 	public static String showOrPostMyInformation(Member member) {
-		
+
 		List<String> notAvailable = new ArrayList<>();
 		notAvailable.add("N/A");
 		notAvailable.add("N/a");
 		notAvailable.add("n/A");
 		notAvailable.add("n/a");
-		
+
 		notAvailable.add("NA");
 		notAvailable.add("na");
 		notAvailable.add("Na");
 		notAvailable.add("nA");
-		
+
 		notAvailable.add("NO");
 		notAvailable.add("No");
 		notAvailable.add("no");
 		notAvailable.add("nO");
-		
+
 		notAvailable.add("None");
 		notAvailable.add("none");
 		notAvailable.add("Dont have");
@@ -405,16 +408,16 @@ public class SouthPoolConstantMessage {
 		notAvailable.add("Not public on FB");
 		notAvailable.add("Pass");
 		notAvailable.add("I do not have facebook");
-		
+
 		String etaDate = DateUtility.toLocaDateTime(member.getEta()).format(DateUtility.FORMAT_DATETIME_INFO);
 		String etdDate = DateUtility.toLocaDateTime(member.getEtd()).format(DateUtility.FORMAT_DATETIME_INFO);
-		
+
 		String message = etaDate.contains("PM") ? " here later!" : " here for today!";
-		
+
 		if (LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0).isBefore(DateUtility.toLocaDateTime(member.getEta()).withHour(0).withMinute(0).withSecond(0).withNano(0))) {
 			message = " here for tomorrow!";
 		}
-		
+
 		StringBuilder sb = new StringBuilder();
 		sb.append("<b>"+member.getYouAre()).append(message+"</b>").append("\n");
 		sb.append("<b>Name: </b>").append("<i>"+member.getName()+"</i>").append("\n");
@@ -437,10 +440,82 @@ public class SouthPoolConstantMessage {
 		String etaTime = TimeUtility.convertToStandardTime(etaDate.split(" ")[1],etaDate.split(" ")[2]);
 		String etdTime = TimeUtility.convertToStandardTime(etdDate.split(" ")[1],etdDate.split(" ")[2]);
 		sb.append("<b>Time: </b>").append("<i>"+etaTime +" - "+ etdTime+"</i>").append("\n");
-		
+
 		if (!notAvailable.contains(member.getCustomMessage())) {
 			sb.append("<b>Instruction: </b>").append("<i>"+member.getCustomMessage()+"</i>").append("\n");	
 		}
+		return sb.toString();
+	}
+
+	public static String showOrPostMyInformationToFollower(Member member) {
+	
+
+		List<String> notAvailable = new ArrayList<>();
+		notAvailable.add("N/A");
+		notAvailable.add("N/a");
+		notAvailable.add("n/A");
+		notAvailable.add("n/a");
+
+		notAvailable.add("NA");
+		notAvailable.add("na");
+		notAvailable.add("Na");
+		notAvailable.add("nA");
+
+		notAvailable.add("NO");
+		notAvailable.add("No");
+		notAvailable.add("no");
+		notAvailable.add("nO");
+
+		notAvailable.add("None");
+		notAvailable.add("none");
+		notAvailable.add("Dont have");
+		notAvailable.add("Not applicable");
+		notAvailable.add(".");
+		notAvailable.add("-");
+		notAvailable.add("~");
+		notAvailable.add("Null");
+		notAvailable.add("null");
+		notAvailable.add("No facebook");
+		notAvailable.add("Not public on FB");
+		notAvailable.add("Pass");
+		notAvailable.add("I do not have facebook");
+
+		String etaDate = DateUtility.toLocaDateTime(member.getEta()).format(DateUtility.FORMAT_DATETIME_INFO);
+		String etdDate = DateUtility.toLocaDateTime(member.getEtd()).format(DateUtility.FORMAT_DATETIME_INFO);
+
+		String message = etaDate.contains("PM") ? " here later!" : " here for today!";
+
+		if (LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0).isBefore(DateUtility.toLocaDateTime(member.getEta()).withHour(0).withMinute(0).withSecond(0).withNano(0))) {
+			message = " here for tomorrow!";
+		}
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("<b>"+member.getYouAre()).append(message+"</b>").append("\n");
+		sb.append("<b>Name: </b>").append("<i>"+member.getName()+"</i>").append("\n");
+		sb.append("<b>Telegram: </b>@").append(member.getUsername()).append("\n");
+		if (!notAvailable.contains(member.getMobileNumber())) {
+			sb.append("<b>Mobile: </b>").append("<i>"+member.getMobileNumber()+"</i>").append("\n");	
+		}
+		if (!notAvailable.contains(member.getPicUpLoc())) {
+			sb.append("\n<b>Pick Up: </b>").append("<i>"+member.getPicUpLoc()+"</i>").append("\n");	
+		}
+		if (!notAvailable.contains(member.getDropOffLoc())) {
+			sb.append("\n<b>Drop Off: </b>").append("<i>"+member.getDropOffLoc()+"</i>").append("\n\n");	
+		}
+		if (!notAvailable.contains(member.getRoute())) {
+			sb.append("<b>Route: </b>").append("<i>"+member.getRoute()+"</i>").append("\n\n");	
+		}
+		if(CallBackContants.DRIVER.equals(member.getYouAre())) {
+			sb.append("<b>Seat: </b>").append("<i>"+member.getAvailableSlots()+"</i>").append("\n");	
+		}
+		String etaTime = TimeUtility.convertToStandardTime(etaDate.split(" ")[1],etaDate.split(" ")[2]);
+		String etdTime = TimeUtility.convertToStandardTime(etdDate.split(" ")[1],etdDate.split(" ")[2]);
+		sb.append("<b>Time: </b>").append("<i>"+etaTime +" - "+ etdTime+"</i>").append("\n");
+
+		if (!notAvailable.contains(member.getCustomMessage())) {
+			sb.append("<b>Instruction: </b>").append("<i>"+member.getCustomMessage()+"</i>").append("\n");	
+		}
+		sb.append("\n\n\n click ot tap to unfollow >> /unfollow__"+member.getUsername()).append("\n");
 		return sb.toString();
 	}
 }

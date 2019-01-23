@@ -64,4 +64,9 @@ public class PersistenceServiceImpl implements PersistenceService {
 	public int updatetHistoryBy(String hqlFormat, Map<String, Object> parameters) {
 		return memberDao.updatetHistoryBy(hqlFormat, parameters);
 	}
+
+	@Override
+	public <T extends Member> List<T> getFolowerBy(Map<String, String> predicatesMap, Class<T> clazz) {
+		return memberDao.getFolowerBy(predicatesMap, clazz);
+	}
 }

@@ -15,5 +15,6 @@ public interface PersistenceService {
 	public <T extends Member> List<T> getCarPlateNumberByUserName(Map<String, String> predicatesMap, Class<T> clazz);
 	public <T extends Member> List<Member> getMembersBetweenDate(String dateColumn, Date startDate, Date endDate, Map<String,String> predicate, Class<T> clazz);
 	public <T extends Member> List<T> getMembersBy(Map<String, String> predicatesMap, Class<T> clazz);
+	public <T extends Member> List<T> getFolowerBy(Map<String, String> predicatesMap, Class<T> clazz);
 	public int updatetHistoryBy(String hqlFormat, Map<String, Object> parameters);
 }

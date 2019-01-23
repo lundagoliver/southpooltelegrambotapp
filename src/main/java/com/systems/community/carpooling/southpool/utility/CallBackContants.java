@@ -50,6 +50,8 @@ public class CallBackContants {
 	public static final String REPORT_TRAFFIC = "report_traffic";
 	public static final String BAN_MEMBER = "ban_member";
 	public static final String COMPLAIN_MEMBER = "complain_member";
+	public static final String FOLLOW_MEMBER = "follow_member";
+	public static final String UNFOLLOW_MEMBER = "unfollow_member";
 	
 	public static final String VIEW_MY_FEEDBACKS = "passenger_feedback";
 	public static final String PASSENGER_FEEDBACK = "passenger_feedback";
